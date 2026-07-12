@@ -1,8 +1,13 @@
 <!DOCTYPE html>
+<!-- Marine Corps PEBD Calculator - Semper Admin -->
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- CR-11 Content Security Policy per NIST SP 800-53 SC-18 -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta name="referrer" content="no-referrer">
     <title>Marine Corps PEBD Calculator by Semper Admin</title>
     <script>
         // Theme bootstrap: dark is the default; a stored preference wins.
@@ -1061,6 +1066,196 @@
             }
         }
 
+        /* CR-05 dynamic CUI banners. Purple #6f42c1 is the CUI Registry visual marking. */
+        #cuiTopBanner, #cuiBottomBanner {
+            display: none;
+            background: #6f42c1;
+            color: #ffffff;
+            text-align: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            padding: 4px 8px;
+        }
+        #cuiTopBanner.active, #cuiBottomBanner.active { display: block; }
+        #cuiTopBanner { position: sticky; top: 0; z-index: 9500; }
+        #cuiBottomBanner { position: sticky; bottom: 0; z-index: 9500; }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 360px;
+        }
+        .toast {
+            padding: 12px 16px;
+            background: var(--color-card);
+            color: var(--color-foreground);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            font-size: 0.9rem;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateX(16px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast-success { border-left: 4px solid var(--color-status-fresh); }
+        .toast-error { border-left: 4px solid var(--color-status-stale); }
+        .toast-warning { border-left: 4px solid var(--color-status-aging-strong); }
+        .toast-info { border-left: 4px solid var(--color-status-info); }
+
+        /* Real-time validation icons */
+        .validation-icon {
+            display: inline-block;
+            margin-left: 6px;
+            font-weight: 700;
+        }
+        .validation-valid { color: var(--color-status-fresh); }
+        .validation-warning { color: var(--color-status-aging-strong); }
+        .validation-invalid { color: var(--color-status-stale); }
+        input.input-invalid {
+            border-color: var(--color-status-stale) !important;
+            box-shadow: 0 0 0 2px var(--color-status-stale-bg);
+        }
+
+        /* CR-01 DoD Notice section inside the combined consent gate */
+        .dod-notice {
+            background: var(--color-muted);
+            border: 1px solid var(--color-border-strong);
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+            max-height: 220px;
+            overflow-y: auto;
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+        .dod-notice h3 {
+            margin: 0 0 8px 0;
+            color: var(--color-heading);
+            font-size: 0.95rem;
+        }
+        .dod-notice p { margin: 0 0 8px 0; }
+        .legal-modal-button-decline {
+            background: var(--color-status-stale);
+            color: #ffffff;
+        }
+
+        /* Semper Admin logo in the page header - transparent emblem, no crop */
+        .header-logo {
+            width: 112px;
+            height: auto;
+            display: block;
+            margin: 0 auto 12px;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+        }
+        @media (max-width: 768px) {
+            .header-logo { width: 84px; }
+        }
+
+        /* Inline UI icons - replace emoji with consistent stroke SVGs */
+        .ui-icon {
+            width: 1.1em;
+            height: 1.1em;
+            vertical-align: -0.18em;
+            margin-right: 7px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* How-to-use and guided example panels */
+        details.guide-details {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        details.guide-details summary {
+            cursor: pointer;
+            padding: 14px 18px;
+            font-weight: 700;
+            color: var(--color-heading);
+            list-style: none;
+            user-select: none;
+        }
+        details.guide-details summary::-webkit-details-marker { display: none; }
+        details.guide-details summary::before {
+            content: '▸';
+            display: inline-block;
+            margin-right: 8px;
+            transition: transform 0.15s ease;
+        }
+        details.guide-details[open] summary::before { transform: rotate(90deg); }
+        .guide-body {
+            padding: 0 18px 18px 18px;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+        .guide-body ol { margin: 8px 0 8px 22px; }
+        .guide-body li { margin-bottom: 6px; }
+        .guide-note {
+            background: var(--color-muted);
+            border-left: 4px solid var(--color-primary);
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+            padding: 0 18px 18px 18px;
+        }
+        .example-card {
+            background: var(--color-muted);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .example-card h4 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--color-heading);
+        }
+        .example-card p {
+            margin: 0;
+            font-size: 0.82rem;
+            color: var(--color-muted-foreground);
+            flex-grow: 1;
+        }
+        .example-expect {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--color-foreground);
+            background: var(--color-card);
+            border: 1px dashed var(--color-border-strong);
+            border-radius: 6px;
+            padding: 6px 8px;
+        }
+        .example-load-btn {
+            align-self: flex-start;
+            background: var(--color-primary);
+            color: var(--color-primary-foreground);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .example-load-btn:hover { background: var(--color-primary-hover); }
+
         /* Guide section 8: motion gates behind prefers-reduced-motion */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -1074,15 +1269,31 @@
     </style>
 </head>
 <body>
-    <!-- Legal Consent Modal -->
-    <div id="legalModal" class="legal-modal-overlay">
+    <!-- CR-05 CUI top banner, hidden until the form contains data -->
+    <div id="cuiTopBanner" aria-live="polite">CUI//SP-PRVCY</div>
+
+    <div id="toastContainer" class="toast-container" aria-live="polite"></div>
+
+    <!-- Combined DoD Notice and Consent + Legal gate (CR-01, DoDI 8500.01 Encl 3) -->
+    <div id="legalModal" class="legal-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="dodBannerTitle">
         <div class="legal-modal">
-            <div class="legal-modal-header">📋 Terms & Legal</div>
+            <div class="legal-modal-header">DoD Notice and Consent, Terms & Legal</div>
+
+            <div class="dod-notice" id="dodNotice">
+                <h3 id="dodBannerTitle">DoD Notice and Consent Banner</h3>
+                <p><strong>You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.</strong></p>
+                <p>By using this IS (which includes any device attached to this IS), you consent to the following conditions:</p>
+                <p>- The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.</p>
+                <p>- At any time, the USG inspects and seizes data stored on this IS.</p>
+                <p>- Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and are disclosed or used for any USG-authorized purpose.</p>
+                <p>- This IS includes security measures (e.g., authentication and access controls) to protect USG interests, not for your personal benefit or privacy.</p>
+                <p>- Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.</p>
+            </div>
 
             <div class="legal-modal-tabs">
-                <button class="legal-modal-tab-button active" onclick="switchLegalTab('terms')">Terms of Service</button>
-                <button class="legal-modal-tab-button" onclick="switchLegalTab('privacy')">Privacy Policy</button>
-                <button class="legal-modal-tab-button" onclick="switchLegalTab('accessibility')">Accessibility</button>
+                <button class="legal-modal-tab-button active" onclick="switchLegalTab('terms', this)">Terms of Service</button>
+                <button class="legal-modal-tab-button" onclick="switchLegalTab('privacy', this)">Privacy Policy</button>
+                <button class="legal-modal-tab-button" onclick="switchLegalTab('accessibility', this)">Accessibility</button>
             </div>
 
             <div id="terms-tab" class="legal-modal-tab active">
@@ -1110,7 +1321,7 @@
                         <li>✓ All calculations run in your browser only</li>
                         <li>✓ Nothing is sent to external servers</li>
                         <li>✓ No analytics or tracking code</li>
-                        <li>✓ No cookies, localStorage, or database storage</li>
+                        <li>✓ No cookies and no database storage. Browser local storage holds only your consent flag and theme choice - never calculation data</li>
                         <li>✓ Your military data stays on your device</li>
                         <li>✓ You control all exports and prints</li>
                     </ul>
@@ -1135,21 +1346,25 @@
 
             <div class="legal-modal-checkbox">
                 <input type="checkbox" id="agreeCheckbox" onchange="updateAgreeButton()">
-                <label for="agreeCheckbox">I have read and understand the Terms of Service. I agree to use this Tool only for reference calculations and will verify results against official military records before any official use.</label>
+                <label for="agreeCheckbox">I acknowledge the DoD Notice and Consent conditions above, and I have read and understand the Terms of Service. I agree to use this Tool only for reference calculations and will verify results against official military records before any official use.</label>
             </div>
 
             <div class="legal-modal-buttons">
-                <button class="legal-modal-button legal-modal-button-accept" id="agreeButton" disabled onclick="acceptLegalTerms()">I Agree & Continue</button>
+                <button class="legal-modal-button legal-modal-button-accept" id="agreeButton" disabled onclick="acceptLegalTerms()">I Acknowledge, Consent & Continue</button>
+                <button class="legal-modal-button legal-modal-button-decline" onclick="declineLegalTerms()">Decline and Exit</button>
             </div>
         </div>
     </div>
     <div class="container">
         <!-- Header -->
         <div class="header">
+            <img class="header-logo" src="assets/images/logo.png" alt="Semper Admin logo">
             <h1 class="title">MARINE CORPS PAY ENTRY BASE DATE (PEBD) <span class="gradient-accent">CALCULATOR</span></h1>
             <p class="subtitle">by Semper Admin - PAA 04-25 Compliant (with Time Loss)</p>
-            <p Reference:><a href="https://usmc.sharepoint-mil.us/sites/dcmra_mra_mi_missa/Lists/PAA/DispForm.aspx?ID=127&e=qD8Oj2" target="_blank" style="font-size: 0.9rem; color: var(--color-muted-foreground); text-decoration: underline;">PAA 04-25 - Administrative Guidance on Creditable Service and PEBD</a>
-
+            <p style="font-size: 0.9rem;">References:
+                <a href="https://usmc.sharepoint-mil.us/sites/dcmra_mra_mi_missa/Lists/PAA/DispForm.aspx?ID=127&amp;e=qD8Oj2" target="_blank" rel="noopener" style="color: var(--color-muted-foreground); text-decoration: underline;">PAA 04-25 - Administrative Guidance on Creditable Service and PEBD</a>
+                <span style="color: var(--color-muted-foreground);">|</span>
+                <a href="https://www.marines.mil/News/Messages/Messages-Display/Article/4409903/marine-corps-total-force-system-advisory-to-identify-required-corrections-to-pa/" target="_blank" rel="noopener" style="color: var(--color-muted-foreground); text-decoration: underline;">MARADMIN 052/26 - MCTFS Advisory to Identify Required Corrections to PEBD</a>
             </p>
             <a class="header-nav-link" href="pay-comparison.html">
                 <svg class="feedback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
@@ -1157,14 +1372,72 @@
             </a>
         </div>
 
+        <!-- How To Use -->
+        <details class="guide-details">
+            <summary><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>HOW TO USE THIS CALCULATOR</summary>
+            <div class="guide-body">
+                <ol>
+                    <li><strong>Enter the Foundational PEBD.</strong> This is the beginning date of the Marine's most recent period of continuous service for pay, in YYYYMMDD format (example: 20240115). Validate it against the DD Form 4 or DD Form 1966.</li>
+                    <li><strong>Select Marine Status and Pathway Type.</strong> The pathway drives special rules - Military Academy service credits only on enlisted pathways (PAA 04-25 para 4.b.4).</li>
+                    <li><strong>Add each period of prior service.</strong> One row per separate period, with service type and inclusive start/end dates. The Creditable column updates as you type - a green check in the Days column means the dates are valid. Use "Add Service Period" for more rows.</li>
+                    <li><strong>Record any time loss.</strong> Add a row for AWOL, confinement, or other lost time. Deductible loss is computed on the 30-day basis per DODFMR Vol 7A Ch 1 and reduces creditable service. Check "Officer Time?" for loss during commissioned service - it is recorded but not deducted.</li>
+                    <li><strong>Click Calculate PEBD.</strong> The breakdown shows the PAA 04-25 six-step method: begin totals, end totals, difference, +1 inclusive day per period, time loss, and the normalized result subtracted from the foundational PEBD.</li>
+                    <li><strong>Act on the result.</strong> Print the CUI-marked report, send the MMPB-21 escalation package if the PEBD of record needs correction (MARADMIN 052/26), or open the Pay Comparison tool to quantify the pay impact.</li>
+                </ol>
+                <div class="guide-note">
+                    <strong>Verify before official use.</strong> This tool is a reference. Confirm every result against source documents (DD Form 4, DD Form 214, NAVMC 763) and the MCTFS D188 remark before submitting a correction.
+                </div>
+            </div>
+        </details>
+
+        <!-- Guided Examples -->
+        <details class="guide-details">
+            <summary><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10L12 5 2 10l10 5 10-5z"></path><path d="M6 12.5V17c0 1.66 2.69 3 6 3s6-1.34 6-3v-4.5"></path></svg>GUIDED EXAMPLES - LOAD ONE, THEN CLICK CALCULATE</summary>
+            <div class="guide-body" style="padding-bottom: 0;">
+                <p style="margin: 0 0 12px 0;">Each example fills the form for you. Review the inputs to see how they are entered, click <strong>Calculate PEBD</strong>, and compare the result against the expected value on the card.</p>
+            </div>
+            <div class="example-grid">
+                <div class="example-card">
+                    <h4>1. Single Prior Enlistment</h4>
+                    <p>The simplest case - one creditable period of prior Navy service. Watch the end-day rule (Dec 15 needs no adjustment) and the +1 inclusive day.</p>
+                    <div class="example-expect">Expected: 3y 6m 15d creditable, PEBD 20200630</div>
+                    <button class="example-load-btn" onclick="loadExample(0)">Load Example</button>
+                </div>
+                <div class="example-card">
+                    <h4>2. PAA 04-25 Official Example</h4>
+                    <p>The worked example from PAA 04-25 Section 6 - pre-1985 DEP plus two active periods, +1 day for each of the three periods.</p>
+                    <div class="example-expect">Expected: 8y 7m 24d creditable, PEBD 19861116</div>
+                    <button class="example-load-btn" onclick="loadExample(1)">Load Example</button>
+                </div>
+                <div class="example-card">
+                    <h4>3. DODFMR Lost Time (AWOL)</h4>
+                    <p>The worked example from DODFMR Vol 7A Ch 1 - one enlistment with 0y 1m 7d of AWOL deducted on the 30-day basis.</p>
+                    <div class="example-expect">Expected: 2y 11m 16d creditable, PEBD 20140304</div>
+                    <button class="example-load-btn" onclick="loadExample(2)">Load Example</button>
+                </div>
+                <div class="example-card">
+                    <h4>4. Military Academy Service</h4>
+                    <p>Academy time credits on the enlisted pathway. After calculating, switch Pathway Type to Officer and recalculate - the credit disappears per PAA 04-25 para 4.b.4.</p>
+                    <div class="example-expect">Expected (Enlisted): 3y 9m 25d, PEBD 20210806. Officer pathway: no change</div>
+                    <button class="example-load-btn" onclick="loadExample(3)">Load Example</button>
+                </div>
+                <div class="example-card">
+                    <h4>5. Creditable and Non-Creditable Mix</h4>
+                    <p>Post-1989 DEP without IDT drills is excluded, the active period counts. The analysis table shows Yes/No creditability per row.</p>
+                    <div class="example-expect">Expected: 3y 0m 0d creditable, PEBD 20200301</div>
+                    <button class="example-load-btn" onclick="loadExample(4)">Load Example</button>
+                </div>
+            </div>
+        </details>
+
         <!-- Marine Information -->
         <div class="section">
-            <h2 class="section-title">👤 MARINE INFORMATION</h2>
+            <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>MARINE INFORMATION</h2>
             <div class="grid grid-3">
                 <div class="form-group">
-                    <label for="foundationalPEBD">(YYYYMMDD):</label>
-                    <input type="text" id="foundationalPEBD" placeholder="YYYYMMDD" maxlength="8">
-                     <label for="foundationalPEBD">Begining date of most recent period of continuous sevice for pay</label>
+                    <label for="foundationalPEBD">Foundational PEBD (YYYYMMDD):</label>
+                    <input type="text" id="foundationalPEBD" placeholder="YYYYMMDD" maxlength="8" oninput="refreshCuiBanner()">
+                    <span style="font-size: 0.8rem; color: var(--color-muted-foreground);">Beginning date of the most recent period of continuous service for pay</span>
                 </div>
                 <div class="form-group">
                     <label for="marineStatus">Marine Status:</label>
@@ -1175,7 +1448,7 @@
                 </div>
                 <div class="form-group">
                     <label for="pathwayType">Pathway Type:</label>
-                    <select id="pathwayType">
+                    <select id="pathwayType" onchange="updateAllPeriods()">
                         <option value="Enlisted DEP/Direct/Reenlisted/Prior Service">Enlisted DEP/Direct/Reenlisted/Prior Service</option>
                         <option value="Officer OCC/PLC/NROTC/Academy">Officer OCC/PLC/NROTC/Academy</option>
                     </select>
@@ -1185,7 +1458,7 @@
 
         <!-- Service Periods -->
         <div class="section">
-            <h2 class="section-title">📋 SERVICE PERIODS (Up to 10)</h2>
+            <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>SERVICE PERIODS</h2>
             <div class="table-container">
                 <table id="periodsTable">
                     <thead>
@@ -1197,6 +1470,7 @@
                             <th>Creditable?</th>
                             <th>Days</th>
                             <th>Notes</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="periodsBody">
@@ -1204,16 +1478,19 @@
                     </tbody>
                 </table>
             </div>
+            <div style="display: flex; justify-content: center;">
+                <button class="btn-primary" onclick="addServicePeriod()"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Add Service Period</button>
+            </div>
         </div>
 
         <!-- Time Loss Periods -->
         <div class="section">
-            <h2 class="section-title">⏱️ TIME LOSS PERIODS</h2>
+            <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>TIME LOSS PERIODS</h2>
             <p style="margin-bottom: 12px; color: var(--color-muted-foreground);">
                 Record periods of lost time (AWOL, confinement, suspension, etc.). Deductible time loss reduces creditable service and shifts the calculated PEBD later.
             </p>
             <p class="time-loss-note">
-                <strong>⚠️ DODFMR Chapter 1:</strong> Time loss applies to enlisted service. Check <strong>"Officer Time?"</strong> for any loss that occurred during commissioned service — those periods are recorded in the analysis but are NOT deducted from the calculation.
+                <strong><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>DODFMR Chapter 1:</strong> Time loss applies to enlisted service. Check <strong>"Officer Time?"</strong> for any loss that occurred during commissioned service — those periods are recorded in the analysis but are NOT deducted from the calculation.
             </p>
             <div class="table-container">
                 <table id="timeLossTable" aria-label="Time loss periods entry table">
@@ -1236,28 +1513,28 @@
                 </table>
             </div>
             <div style="display: flex; justify-content: center;">
-                <button class="btn-danger" onclick="addTimeLossPeriod()">➕ Add Time Loss Period</button>
+                <button class="btn-danger" onclick="addTimeLossPeriod()"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>Add Time Loss Period</button>
             </div>
         </div>
 
         <!-- Control Buttons -->
         <div class="button-container">
             <button class="btn-primary" onclick="calculatePEBD()">
-                🧮 Calculate PEBD
+                <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="12" x2="8.01" y2="12"></line><line x1="12" y1="12" x2="12.01" y2="12"></line><line x1="16" y1="12" x2="16.01" y2="12"></line><line x1="8" y1="16" x2="8.01" y2="16"></line><line x1="12" y1="16" x2="12.01" y2="16"></line><line x1="16" y1="16" x2="16.01" y2="16"></line></svg>Calculate PEBD
             </button>
             <button class="btn-success" id="printBtn" onclick="printReport()" disabled>
-                🖨️ Print Report
+                <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>Print Report
             </button>
             <button class="btn-secondary" onclick="resetAll()">
-                🔄 Reset All
+                <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>Reset All
             </button>
         </div>
 
         <!-- Results -->
         <div id="results" class="hidden">
             <div class="results">
-                <h2 class="section-title">📊 CALCULATION BREAKDOWN<span class="legal-badge">Reference Only</span></h2>
-                <p style="font-size: 0.9rem; color: var(--color-status-aging-strong); margin: 0 0 20px 0; padding: 12px; background-color: var(--color-status-aging-bg); border-radius: 8px;"><strong>⚠️ Not for official use:</strong> Always verify against official military records (DD Form 4, DD Form 214, NAVMC 763) and contact your PAC for official PEBD disputes.</p>
+                <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>CALCULATION BREAKDOWN<span class="legal-badge">Reference Only</span></h2>
+                <p style="font-size: 0.9rem; color: var(--color-status-aging-strong); margin: 0 0 20px 0; padding: 12px; background-color: var(--color-status-aging-bg); border-radius: 8px;"><strong><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>Not for official use:</strong> Always verify against official military records (DD Form 4, DD Form 214, NAVMC 763) and contact your PAC for official PEBD disputes.</p>
 
                 <!-- Summary -->
                 <div class="result-highlight">
@@ -1337,6 +1614,19 @@
                     </div>
                 </div>
 
+                <!-- MMPB-21 Escalation Package (MARADMIN 052/26 Step 3) -->
+                <div class="companion-prompt">
+                    <p class="companion-prompt-title">Escalate to MMPB-21</p>
+                    <p class="companion-prompt-text">If the calculated PEBD differs from the PEBD of record and PAC has validated the discrepancy against the OMPF and the MCTFS D188 remark, send the pre-filled correction package to MMPB-21 per <a href="https://www.marines.mil/News/Messages/Messages-Display/Article/4409903/marine-corps-total-force-system-advisory-to-identify-required-corrections-to-pa/" target="_blank" rel="noopener" style="color: var(--color-primary); text-decoration: underline;">MARADMIN 052/26</a>.</p>
+                    <div class="companion-actions">
+                        <button class="companion-open-btn" type="button" onclick="emailMmpb21Package()">
+                            <svg class="feedback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                            Email MMPB-21 Package
+                        </button>
+                    </div>
+                    <p class="companion-note">Opens your mail client with a CUI-marked summary addressed to SMB_Pay_Entry_Base_Date_Correction@usmc.mil. Attach the printed report before sending.</p>
+                </div>
+
                 <!-- Pay Comparison Handoff -->
                 <div class="companion-prompt">
                     <p class="companion-prompt-title">Next Step: Compare Pay Impact</p>
@@ -1380,7 +1670,19 @@
             try { localStorage.setItem('semper_theme', dark ? 'dark' : 'light'); } catch (e) {}
         }
 
-        // Service Type Definitions from PAA 04-25
+        // CR-10 single source compliance configuration
+        window.COMPLIANCE_CONFIG = {
+            appName: 'Marine Corps PEBD Calculator',
+            appOwner: 'USMC MMPB-21',
+            cuiMarking: 'CUI//SP-PRVCY',
+            mmpb21Mailto: 'SMB_Pay_Entry_Base_Date_Correction@usmc.mil',
+            paaReference: 'https://usmc.sharepoint-mil.us/sites/dcmra_mra_mi_missa/Lists/PAA/DispForm.aspx?ID=127&e=qD8Oj2',
+            maradminReference: 'https://www.marines.mil/News/Messages/Messages-Display/Article/4409903/marine-corps-total-force-system-advisory-to-identify-required-corrections-to-pa/'
+        };
+
+        // Service Type Definitions from PAA 04-25.
+        // DEP creditability follows DODFMR Vol 7A - before 1 Jan 1985 creditable,
+        // on or after only with post-1989 IDT drills.
         const SERVICE_TYPES = {
             "Regular Army": { creditable: true, category: "Active" },
             "Regular Navy": { creditable: true, category: "Active" },
@@ -1395,24 +1697,91 @@
             "Army National Guard": { creditable: true, category: "Reserve" },
             "Air National Guard": { creditable: true, category: "Reserve" },
             "PHS Commissioned Corps": { creditable: true, category: "Other" },
-            "NOAA": { creditable: true, category: "Other" },
+            "PHS Reserve Corps": { creditable: true, category: "Other" },
+            "NOAA Officer Service": { creditable: true, category: "Other" },
+            "NOAA Deck Officer Service": { creditable: true, category: "Other" },
             "Military Academy Service": { creditable: true, category: "Academy" },
+            "Fleet Reserve": { creditable: true, category: "Reserve" },
+            "Fleet Marine Corps Reserve": { creditable: true, category: "Reserve" },
+            "Cadet/Midshipman Service (Non-Commissioned)": { creditable: true, category: "Academy" },
+            "Temporary Coast Guard Reserve": { creditable: true, category: "Reserve" },
             "ROTC (Post 1979 w/Reserve)": { creditable: true, category: "ROTC" },
             "ROTC (1964-1979)": { creditable: false, category: "ROTC" },
+            "ROTC (Pre-1964)": { creditable: false, category: "ROTC" },
+            "Service with Retired Pay": { creditable: true, category: "Retired" },
+            "Medical Retention Service": { creditable: true, category: "Medical" },
+            "Under-age Service (Valid Enlistment)": { creditable: true, category: "Special" },
+            "Service Terminated by Desertion": { creditable: true, category: "Special" },
+            "Detailed Service (Other Agency)": { creditable: true, category: "Special" },
+            "Service Before 10 Jan 1962": { creditable: true, category: "Historical" },
             "Philippine Army Officer": { creditable: false, category: "Excluded" },
             "State Guard": { creditable: false, category: "Excluded" },
+            "Territorial Guard": { creditable: false, category: "Excluded" },
+            "Home Guard": { creditable: false, category: "Excluded" },
+            "Emergency Officers Retired List": { creditable: false, category: "Excluded" },
             "AFHPSP/FAP (Post 1981)": { creditable: false, category: "Excluded" },
+            "USUHS Student (DOM)": { creditable: false, category: "Excluded" },
+            "Inactive National Guard": { creditable: false, category: "Excluded" },
             "Delayed Entry Program (Before January 1985)": { creditable: true, category: "DEP" },
-            "Delayed Entry Program (on or after January 1985)": { creditable: false, category: "DEP" }
+            "Delayed Entry Program (1985-1989 No IDT)": { creditable: false, category: "DEP" },
+            "Delayed Entry Program (Post 1989 w/IDT)": { creditable: true, category: "DEP" },
+            "Delayed Entry Program (Post 1989 No IDT)": { creditable: false, category: "DEP" }
         };
 
-        // Time Loss Types from PAA 04-25 / DODFMR
+        // Academy service credits toward PEBD only on enlisted pathways (PAA 04-25)
+        function isServiceCreditable(serviceType, pathwayType) {
+            if (serviceType === "Military Academy Service") {
+                return !(pathwayType && pathwayType.includes("Officer"));
+            }
+            return SERVICE_TYPES[serviceType]?.creditable || false;
+        }
+
+        // Toast notifications replace alert() dialogs
+        function showToast(message, type = 'info', duration = 3500) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // CR-05 dynamic CUI banners - visible only while the form holds data
+        function hasFormData() {
+            const pebd = document.getElementById('foundationalPEBD');
+            if (pebd && pebd.value.trim()) return true;
+            const inputs = document.querySelectorAll('[data-period][data-field], [data-timeloss][data-field]');
+            for (const el of inputs) {
+                if (el.type === 'checkbox') { if (el.checked) return true; }
+                else if (el.value && String(el.value).trim()) return true;
+            }
+            return false;
+        }
+        function refreshCuiBanner() {
+            const on = hasFormData();
+            document.getElementById('cuiTopBanner')?.classList.toggle('active', on);
+            document.getElementById('cuiBottomBanner')?.classList.toggle('active', on);
+        }
+
+        // Time Loss Types per DODFMR Vol 7A Ch 1 Table 1-2.
+        // Authorized leave and authorized excess leave are creditable (Rule 1).
+        // Unauthorized absence, desertion, confinement with conviction, and
+        // misconduct disease/injury over one day are not creditable (Rules 3-9).
         const TIME_LOSS_TYPES = {
             "AWOL (Absence Without Leave)": { deductible: true, category: "Unauthorized Absence" },
             "Desertion": { deductible: true, category: "Unauthorized Absence" },
             "Confinement (Court-Martial)": { deductible: true, category: "Disciplinary" },
-            "Confinement (Civil)": { deductible: true, category: "Disciplinary" },
-            "Suspension from Duty": { deductible: true, category: "Disciplinary" },
+            "Confinement (Civil, Convicted)": { deductible: true, category: "Disciplinary" },
+            "Misconduct Disease/Injury (Alcohol/Drugs)": { deductible: true, category: "Disciplinary" },
+            "Unauthorized Absence (Other)": { deductible: true, category: "Unauthorized Absence" },
+            "Dropped from Rolls": { deductible: true, category: "Administrative" },
+            "Excess Leave (Unauthorized)": { deductible: true, category: "Administrative" },
+            "Excess Leave (Authorized)": { deductible: false, category: "Administrative" },
             "Administrative Leave (Pending Investigation)": { deductible: false, category: "Administrative" },
             "Emergency Leave": { deductible: false, category: "Administrative" },
             "Ordinary Leave": { deductible: false, category: "Administrative" },
@@ -1420,11 +1789,40 @@
             "Maternity/Paternity Leave": { deductible: false, category: "Administrative" },
             "TDY/TAD": { deductible: false, category: "Duty" },
             "Training": { deductible: false, category: "Duty" },
-            "Hospitalization": { deductible: false, category: "Medical" },
-            "Unauthorized Absence (Other)": { deductible: true, category: "Unauthorized Absence" },
-            "Dropped from Rolls": { deductible: true, category: "Administrative" },
-            "Excess Leave": { deductible: true, category: "Administrative" }
+            "Hospitalization": { deductible: false, category: "Medical" }
         };
+
+        // Lost time per DODFMR Vol 7A Ch 1, para 2.4.1.3.1 - computed on the
+        // 30-day-month basis as years/months/days with +1 inclusive day.
+        // A loss beginning on the 31st counts that day (start treated as 30).
+        // An ending day 31 caps at 30 on the 30-day convention.
+        function computeLostTime(startDate, endDate) {
+            if (!parseDate(startDate) || !parseDate(endDate) || endDate < startDate) return null;
+            let sy = parseInt(startDate.substring(0, 4), 10);
+            let sm = parseInt(startDate.substring(4, 6), 10);
+            let sd = parseInt(startDate.substring(6, 8), 10);
+            let ey = parseInt(endDate.substring(0, 4), 10);
+            let em = parseInt(endDate.substring(4, 6), 10);
+            let ed = parseInt(endDate.substring(6, 8), 10);
+
+            if (sd === 31) sd = 30; // include the 31st as a lost day
+            if (ed === 31) ed = 30;
+
+            let years = ey - sy;
+            let months = em - sm;
+            let days = ed - sd + 1; // inclusive day
+
+            while (days < 0) { days += 30; months -= 1; }
+            while (months < 0) { months += 12; years -= 1; }
+            while (days >= 30) { days -= 30; months += 1; }
+            while (months >= 12) { months -= 12; years += 1; }
+
+            return { years, months, days };
+        }
+
+        function fmtYMD(t) {
+            return `${t.years}y ${t.months}m ${t.days}d`;
+        }
 
         function isTimeLossDeductible(lossType) {
             return TIME_LOSS_TYPES[lossType]?.deductible || false;
@@ -1447,7 +1845,7 @@
         // Add time loss period row
         function addTimeLossPeriod() {
             if (timeLossRowCount() >= 10) {
-                alert('Maximum 10 time loss periods allowed');
+                showToast('Maximum 10 time loss periods allowed.', 'warning');
                 return;
             }
             const tbody = document.getElementById('timeLossBody');
@@ -1521,61 +1919,127 @@
                 deductibleCell.innerHTML = '';
             }
 
+            const validation = validateDatePair(startDate, endDate);
             if (startDate.length === 8 && endDate.length === 8) {
-                const days = calculateDays(startDate, endDate);
-                daysCell.textContent = days > 0 ? days : 'Invalid';
+                renderDaysWithValidation(daysCell, calculateDays(startDate, endDate), validation);
             } else {
-                daysCell.textContent = '';
+                daysCell.innerHTML = '';
             }
+            refreshCuiBanner();
         }
 
-        // Initialize the periods table
-        function initializePeriods() {
+        // Dynamic service period rows - unlimited, with add/remove
+        let servicePeriodIndexSeq = 0; // unique row indexes survive removals
+
+        function servicePeriodRows() {
+            return document.querySelectorAll('#periodsBody tr[id^="service-period-"]');
+        }
+
+        function addServicePeriod() {
             const tbody = document.getElementById('periodsBody');
-            tbody.innerHTML = '';
-            
-            for (let i = 0; i < 10; i++) {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${i + 1}</td>
-                    <td>
-                        <select onchange="updatePeriod(${i})" data-period="${i}" data-field="serviceType">
-                            <option value="">Select Service Type</option>
-                            ${Object.keys(SERVICE_TYPES).map(type => 
-                                `<option value="${type}">${type}</option>`
-                            ).join('')}
-                        </select>
-                    </td>
-                    <td>
-                        <input type="text" placeholder="YYYMMDD" maxlength="8" 
-                               onkeyup="updatePeriod(${i})" data-period="${i}" data-field="startDate">
-                    </td>
-                    <td>
-                        <input type="text" placeholder="YYYMMDD" maxlength="8" 
-                               onkeyup="updatePeriod(${i})" data-period="${i}" data-field="endDate">
-                    </td>
-                    <td id="creditable-${i}"></td>
-                    <td id="days-${i}"></td>
-                    <td>
-                        <input type="text" placeholder="Notes..." 
-                               data-period="${i}" data-field="notes">
-                    </td>
-                `;
-                tbody.appendChild(row);
-            }
+            const i = servicePeriodIndexSeq++;
+            const row = document.createElement('tr');
+            row.id = `service-period-${i}`;
+            row.innerHTML = `
+                <td class="period-number">${servicePeriodRows().length + 1}</td>
+                <td>
+                    <select onchange="updatePeriod(${i}); refreshCuiBanner();" data-period="${i}" data-field="serviceType" aria-label="Service type for service period">
+                        <option value="">Select Service Type</option>
+                        ${Object.keys(SERVICE_TYPES).map(type =>
+                            `<option value="${type}">${type}</option>`
+                        ).join('')}
+                    </select>
+                </td>
+                <td>
+                    <input type="text" placeholder="YYYYMMDD" maxlength="8"
+                           oninput="updatePeriod(${i}); refreshCuiBanner();" data-period="${i}" data-field="startDate" aria-label="Start date for service period">
+                </td>
+                <td>
+                    <input type="text" placeholder="YYYYMMDD" maxlength="8"
+                           oninput="updatePeriod(${i}); refreshCuiBanner();" data-period="${i}" data-field="endDate" aria-label="End date for service period">
+                </td>
+                <td id="creditable-${i}"></td>
+                <td id="days-${i}"></td>
+                <td>
+                    <input type="text" placeholder="Notes..."
+                           oninput="refreshCuiBanner()" data-period="${i}" data-field="notes" aria-label="Notes for service period">
+                </td>
+                <td><button class="btn-small btn-danger" onclick="removeServicePeriod(${i})" title="Remove this service period">Remove</button></td>
+            `;
+            tbody.appendChild(row);
         }
 
-        // Parse YYYYMMDD date
-        function parseDate(dateStr) {
-            if (!dateStr || dateStr.length !== 8) return null;
-            try {
-                const year = parseInt(dateStr.substring(0, 4));
-                const month = parseInt(dateStr.substring(4, 6)) - 1;
-                const day = parseInt(dateStr.substring(6, 8));
-                return new Date(year, month, day);
-            } catch {
-                return null;
+        function removeServicePeriod(i) {
+            const row = document.getElementById(`service-period-${i}`);
+            if (!row) return;
+            if (servicePeriodRows().length === 1) {
+                showToast('At least one service period row is required.', 'warning');
+                return;
             }
+            row.remove();
+            renumberServicePeriods();
+            refreshCuiBanner();
+        }
+
+        function renumberServicePeriods() {
+            let n = 1;
+            document.querySelectorAll('#periodsBody .period-number').forEach(cell => {
+                cell.textContent = n++;
+            });
+        }
+
+        // Initialize the periods table with three starter rows
+        function initializePeriods() {
+            document.getElementById('periodsBody').innerHTML = '';
+            servicePeriodIndexSeq = 0;
+            for (let k = 0; k < 3; k++) addServicePeriod();
+        }
+
+        // Re-evaluate every row when the pathway changes (academy logic depends on it)
+        function updateAllPeriods() {
+            servicePeriodRows().forEach(row => {
+                const i = parseInt(row.id.replace('service-period-', ''), 10);
+                updatePeriod(i);
+            });
+        }
+
+        // Parse YYYYMMDD date - rejects malformed strings and impossible calendar dates
+        function parseDate(dateStr) {
+            if (!dateStr || !/^\d{8}$/.test(dateStr)) return null;
+            const year = parseInt(dateStr.substring(0, 4), 10);
+            const month = parseInt(dateStr.substring(4, 6), 10) - 1;
+            const day = parseInt(dateStr.substring(6, 8), 10);
+            const d = new Date(year, month, day);
+            // Round-trip check catches 20240231, month 13, day 00, etc.
+            if (d.getFullYear() !== year || d.getMonth() !== month || d.getDate() !== day) return null;
+            return d;
+        }
+
+        // Real-time validation for a date pair - returns errors/warnings
+        function validateDatePair(startStr, endStr) {
+            const errors = [];
+            const warnings = [];
+            const start = parseDate(startStr);
+            const end = parseDate(endStr);
+            if (startStr && startStr.length === 8 && !start) errors.push('Start date is not a valid calendar date');
+            if (endStr && endStr.length === 8 && !end) errors.push('End date is not a valid calendar date');
+            if (start && end && end < start) errors.push('End date precedes start date');
+            if (start && start > new Date()) warnings.push('Start date is in the future');
+            return { errors, warnings, start, end };
+        }
+
+        function renderDaysWithValidation(daysCell, days, validation) {
+            let dayDisplay = days > 0 ? String(days) : 'Invalid';
+            let icon = '';
+            if (validation.errors.length > 0) {
+                icon = '<span class="validation-icon validation-invalid" title="' + validation.errors.join('. ') + '">&times;</span>';
+                dayDisplay = 'Error';
+            } else if (validation.warnings.length > 0) {
+                icon = '<span class="validation-icon validation-warning" title="' + validation.warnings.join('. ') + '">!</span>';
+            } else if (days > 0) {
+                icon = '<span class="validation-icon validation-valid">&check;</span>';
+            }
+            daysCell.innerHTML = dayDisplay + icon;
         }
 
         // Calculate days between dates
@@ -1586,49 +2050,50 @@
             return Math.floor((end - start) / (1000 * 60 * 60 * 24)) + 1;
         }
 
-        // Update period info when fields change
+        // Update period info with real-time validation feedback
         function updatePeriod(periodIndex) {
             const serviceSelect = document.querySelector(`select[data-period="${periodIndex}"][data-field="serviceType"]`);
             const startInput = document.querySelector(`input[data-period="${periodIndex}"][data-field="startDate"]`);
             const endInput = document.querySelector(`input[data-period="${periodIndex}"][data-field="endDate"]`);
-            
+            if (!serviceSelect || !startInput || !endInput) return;
+
             const serviceType = serviceSelect.value;
-            const startDate = startInput.value;
-            const endDate = endInput.value;
-            
+            const startDate = startInput.value.trim();
+            const endDate = endInput.value.trim();
+            const pathwayType = document.getElementById('pathwayType').value;
+
             const creditableCell = document.getElementById(`creditable-${periodIndex}`);
             const daysCell = document.getElementById(`days-${periodIndex}`);
-            
-            // Update creditable status
+
+            // Creditable status honors the academy/pathway rule
             if (serviceType) {
-                const isCreditable = SERVICE_TYPES[serviceType]?.creditable || false;
-                creditableCell.innerHTML = `<span class="${isCreditable ? 'creditable-yes' : 'creditable-no'}">${isCreditable ? 'Yes' : 'No'}</span>`;
+                const creditable = isServiceCreditable(serviceType, pathwayType);
+                creditableCell.innerHTML = `<span class="${creditable ? 'creditable-yes' : 'creditable-no'}">${creditable ? 'Yes' : 'No'}</span>`;
             } else {
                 creditableCell.innerHTML = '';
             }
-            
-            // Update days
-            if (startDate && endDate && startDate.length === 8 && endDate.length === 8) {
-                const days = calculateDays(startDate, endDate);
-                daysCell.textContent = days > 0 ? days : 'Invalid';
+
+            // Days + validation icons, with invalid-field highlighting
+            const validation = validateDatePair(startDate, endDate);
+            startInput.classList.toggle('input-invalid', startDate.length === 8 && !parseDate(startDate));
+            endInput.classList.toggle('input-invalid', (endDate.length === 8 && !parseDate(endDate)) || (validation.start && validation.end && validation.end < validation.start));
+            if (startDate.length === 8 && endDate.length === 8) {
+                renderDaysWithValidation(daysCell, calculateDays(startDate, endDate), validation);
             } else {
-                daysCell.textContent = '';
+                daysCell.innerHTML = '';
             }
         }
 
-        // Legal Modal Functions
-        function switchLegalTab(tabName) {
-            // Hide all tabs
+        // Combined consent gate functions (DoD notice + legal terms, one click)
+        function switchLegalTab(tabName, btn) {
             document.querySelectorAll('.legal-modal-tab').forEach(tab => {
                 tab.classList.remove('active');
             });
-            document.querySelectorAll('.legal-modal-tab-button').forEach(btn => {
-                btn.classList.remove('active');
+            document.querySelectorAll('.legal-modal-tab-button').forEach(b => {
+                b.classList.remove('active');
             });
-
-            // Show selected tab
             document.getElementById(tabName + '-tab').classList.add('active');
-            event.target.classList.add('active');
+            if (btn) btn.classList.add('active');
         }
 
         function updateAgreeButton() {
@@ -1638,13 +2103,26 @@
         }
 
         function acceptLegalTerms() {
+            const stamp = new Date().toISOString();
             localStorage.setItem('pebd_legal_accepted', 'true');
-            localStorage.setItem('pebd_legal_accepted_date', new Date().toISOString());
+            localStorage.setItem('pebd_legal_accepted_date', stamp);
+            localStorage.setItem('pebd_dod_consent', 'true');
+            localStorage.setItem('pebd_dod_consent_date', stamp);
             document.getElementById('legalModal').style.display = 'none';
         }
 
+        // CR-01 decline path - leave the application
+        function declineLegalTerms() {
+            document.body.innerHTML =
+                '<div style="max-width: 560px; margin: 80px auto; font-family: system-ui, sans-serif; text-align: center;">' +
+                '<h2>Access Declined</h2>' +
+                '<p>You declined the DoD Notice and Consent conditions. This tool is unavailable without consent. Close this tab or reload the page to review the notice again.</p>' +
+                '</div>';
+        }
+
         function checkLegalConsent() {
-            const accepted = localStorage.getItem('pebd_legal_accepted');
+            const accepted = localStorage.getItem('pebd_legal_accepted') === 'true'
+                && localStorage.getItem('pebd_dod_consent') === 'true';
             if (!accepted) {
                 document.getElementById('legalModal').style.display = 'flex';
                 return false;
@@ -1658,50 +2136,52 @@
             initializePeriods();
             initializeTimeLossPeriods();
             checkLegalConsent();
+            refreshCuiBanner();
         });
 
         // Calculate PEBD
         function calculatePEBD() {
             // Check consent before calculating
             if (!checkLegalConsent()) {
-                alert('You must agree to the Terms of Service to use this Tool. Please review and accept the terms.');
+                showToast('You must acknowledge the DoD notice and agree to the Terms of Service before calculating.', 'warning', 5000);
                 return;
             }
             try {
                 const foundationalPEBD = document.getElementById('foundationalPEBD').value.trim();
                 const marineStatus = document.getElementById('marineStatus').value;
                 const pathwayType = document.getElementById('pathwayType').value;
-                
-                if (!foundationalPEBD || foundationalPEBD.length !== 8) {
-                    alert('Foundational PEBD is required in YYYYMMDD format');
+
+                if (!parseDate(foundationalPEBD)) {
+                    showToast('Foundational PEBD is required as a valid date in YYYYMMDD format.', 'error');
                     return;
                 }
 
-                const periods = [];
                 const beginningDates = [];
                 const endingDates = [];
                 const periodDetails = [];
 
-                // Collect all periods
-                for (let i = 0; i < 10; i++) {
+                // Collect all periods from the dynamic rows
+                let rowNumber = 0;
+                servicePeriodRows().forEach(row => {
+                    rowNumber++;
+                    const i = parseInt(row.id.replace('service-period-', ''), 10);
                     const serviceSelect = document.querySelector(`select[data-period="${i}"][data-field="serviceType"]`);
                     const startInput = document.querySelector(`input[data-period="${i}"][data-field="startDate"]`);
                     const endInput = document.querySelector(`input[data-period="${i}"][data-field="endDate"]`);
                     const notesInput = document.querySelector(`input[data-period="${i}"][data-field="notes"]`);
-                    
+
                     const serviceType = serviceSelect.value;
-                    const startDate = startInput.value;
-                    const endDate = endInput.value;
+                    const startDate = startInput.value.trim();
+                    const endDate = endInput.value.trim();
                     const notes = notesInput.value;
-                    
+
                     if (serviceType && startDate && endDate) {
-                        const serviceInfo = SERVICE_TYPES[serviceType];
-                        const isCreditable = serviceInfo?.creditable || false;
+                        const isCreditable = isServiceCreditable(serviceType, pathwayType);
                         const days = calculateDays(startDate, endDate);
                         
                         if (days > 0) {
                             periodDetails.push({
-                                period: i + 1,
+                                period: rowNumber,
                                 serviceType,
                                 startDate,
                                 endDate,
@@ -1728,12 +2208,15 @@
                             }
                         }
                     }
-                }
+                });
 
-                // Collect time loss periods (deductible types reduce creditable service;
-                // "Officer Time?" periods are recorded but not deducted per DODFMR Chapter 1)
+                // Collect time loss periods. Deductible, non-officer-time losses are
+                // computed on the 30-day-month basis per DODFMR Vol 7A Ch 1 para 2.4.1.3.1
+                // (years/months/days with +1 inclusive day) and reduce creditable service.
+                // "Officer Time?" periods are recorded but not deducted.
                 const timeLossDetails = [];
-                let totalTimeLossDays = 0;
+                const timeLossTotals = { years: 0, months: 0, days: 0 };
+                let timeLossApplied = false;
                 document.querySelectorAll('#timeLossBody tr[id^="timeloss-period-"]').forEach((row, idx) => {
                     const lossType = row.querySelector('select[data-field="lossType"]').value;
                     const startDate = row.querySelector('input[data-field="startDate"]').value.trim();
@@ -1742,8 +2225,9 @@
                     const isOfficerTime = row.querySelector('input[data-field="officerTime"]').checked;
 
                     if (lossType && startDate.length === 8 && endDate.length === 8) {
+                        const lost = computeLostTime(startDate, endDate);
                         const days = calculateDays(startDate, endDate);
-                        if (days > 0) {
+                        if (lost && days > 0) {
                             const deductible = isTimeLossDeductible(lossType);
                             const applied = deductible && !isOfficerTime;
                             timeLossDetails.push({
@@ -1755,9 +2239,15 @@
                                 isOfficerTime,
                                 applied,
                                 days,
+                                lost,
                                 notes
                             });
-                            if (applied) totalTimeLossDays += days;
+                            if (applied) {
+                                timeLossTotals.years += lost.years;
+                                timeLossTotals.months += lost.months;
+                                timeLossTotals.days += lost.days;
+                                timeLossApplied = true;
+                            }
                         }
                     }
                 });
@@ -1794,11 +2284,11 @@
                         days: difference.days + beginningDates.length
                     };
 
-                    // Subtract deductible time loss (DODFMR Chapter 1 / PAA 04-25)
+                    // Subtract deductible time loss on the 30-day basis (DODFMR Vol 7A Ch 1)
                     const afterTimeLoss = {
-                        years: inclusiveAdjusted.years,
-                        months: inclusiveAdjusted.months,
-                        days: inclusiveAdjusted.days - totalTimeLossDays
+                        years: inclusiveAdjusted.years - timeLossTotals.years,
+                        months: inclusiveAdjusted.months - timeLossTotals.months,
+                        days: inclusiveAdjusted.days - timeLossTotals.days
                     };
 
                     // Normalize
@@ -1843,7 +2333,8 @@
                         difference,
                         inclusiveAdjusted,
                         afterTimeLoss,
-                        totalTimeLossDays,
+                        timeLossTotals,
+                        timeLossApplied,
                         normalized,
                         numPeriods: beginningDates.length,
                         calculationDate: new Date().toLocaleString()
@@ -1851,40 +2342,44 @@
 
                     displayResults();
                     document.getElementById('printBtn').disabled = false;
+                    showToast('PEBD calculated.', 'success');
+                } else {
+                    showToast('No creditable service periods entered. Add at least one complete, creditable period.', 'warning', 5000);
                 }
             } catch (error) {
-                alert('Error in calculation: ' + error.message);
+                showToast('Error in calculation: ' + error.message, 'error', 6000);
             }
         }
 
-        // Subtract service from date
+        // Subtract service from date using pure 30-day-month arithmetic (PAA 04-25).
+        // No Date constructor - it would roll a nominal day 29/30 in February into March.
         function subtractServiceFromDate(dateStr, years, months, days) {
-            const date = parseDate(dateStr);
-            if (!date) return dateStr;
-            
-            let resultYear = date.getFullYear() - years;
-            let resultMonth = date.getMonth() + 1 - months;
-            let resultDay = date.getDate() - days;
-            
-            // Handle negative days
-            while (resultDay <= 0) {
-                resultMonth -= 1;
-                resultDay += 30;
+            if (!/^\d{8}$/.test(dateStr)) return dateStr;
+            let y = parseInt(dateStr.substring(0, 4), 10);
+            let m = parseInt(dateStr.substring(4, 6), 10);
+            let d = parseInt(dateStr.substring(6, 8), 10);
+
+            y -= years;
+            m -= months;
+            d -= days;
+
+            // Borrow days from months on the 30-day convention
+            while (d <= 0) {
+                m -= 1;
+                d += 30;
             }
-            
-            // Handle negative months
-            while (resultMonth <= 0) {
-                resultYear -= 1;
-                resultMonth += 12;
+            // Borrow months from years
+            while (m <= 0) {
+                y -= 1;
+                m += 12;
             }
-            
-            // Create result date and format
-            const resultDate = new Date(resultYear, resultMonth - 1, resultDay);
-            const year = resultDate.getFullYear().toString();
-            const month = (resultDate.getMonth() + 1).toString().padStart(2, '0');
-            const day = resultDate.getDate().toString().padStart(2, '0');
-            
-            return year + month + day;
+
+            // Clamp a nominal 30-day-convention result onto the real calendar
+            // (February 29/30 in the convention becomes the actual last day of February)
+            const lastDay = new Date(y, m, 0).getDate();
+            if (d > lastDay) d = lastDay;
+
+            return String(y) + String(m).padStart(2, '0') + String(d).padStart(2, '0');
         }
 
         // Display results
@@ -1923,9 +2418,9 @@
                     <td>${data.inclusiveAdjusted.months}</td>
                     <td>${data.inclusiveAdjusted.days}</td>
                 </tr>
-                ${data.totalTimeLossDays > 0 ? `
+                ${data.timeLossApplied ? `
                 <tr class="lost-time-row">
-                    <td><strong>Less Time Loss (${data.totalTimeLossDays} days)</strong></td>
+                    <td><strong>Less Time Loss (${fmtYMD(data.timeLossTotals)})</strong></td>
                     <td>${data.afterTimeLoss.years}</td>
                     <td>${data.afterTimeLoss.months}</td>
                     <td>${data.afterTimeLoss.days}</td>
@@ -1966,7 +2461,7 @@
                         <td class="${detail.applied ? 'creditable-no' : 'creditable-yes'}">
                             ${detail.applied ? 'Yes' : (detail.deductible && detail.isOfficerTime ? 'No (Officer Time)' : 'No')}
                         </td>
-                        <td>${detail.days}</td>
+                        <td>${detail.days}${detail.applied ? ' (' + fmtYMD(detail.lost) + ')' : ''}</td>
                         <td>${detail.notes}</td>
                     </tr>
                 `).join('');
@@ -1985,7 +2480,7 @@
         // Print report
         function printReport() {
             if (!calculationResult) {
-                alert('Please calculate PEBD first before printing.');
+                showToast('Calculate PEBD first, then print.', 'warning');
                 return;
             }
 
@@ -1996,9 +2491,10 @@
             setTimeout(() => printWindow.print(), 250);
         }
 
-        // Generate HTML report
+        // Generate HTML report (CR-09 - carries CUI markings top and bottom)
         function generateHTMLReport() {
             const data = calculationResult;
+            const cui = (window.COMPLIANCE_CONFIG && window.COMPLIANCE_CONFIG.cuiMarking) || 'CUI//SP-PRVCY';
 
             const periodsHTML = data.periodDetails.map(detail => `
                 <tr>
@@ -2012,8 +2508,8 @@
                 </tr>
             `).join('');
 
-            const timeLossRowHTML = data.totalTimeLossDays > 0 ? `
-                            <tr style="background-color: #fdecea;"><td><strong>Less Time Loss (${data.totalTimeLossDays} days)</strong></td><td>${data.afterTimeLoss.years}</td><td>${data.afterTimeLoss.months}</td><td>${data.afterTimeLoss.days}</td></tr>` : '';
+            const timeLossRowHTML = data.timeLossApplied ? `
+                            <tr style="background-color: #fdecea;"><td><strong>Less Time Loss (${fmtYMD(data.timeLossTotals)})</strong></td><td>${data.afterTimeLoss.years}</td><td>${data.afterTimeLoss.months}</td><td>${data.afterTimeLoss.days}</td></tr>` : '';
 
             const timeLossSectionHTML = data.timeLossDetails.length > 0 ? `
                     <div class="section">
@@ -2027,7 +2523,7 @@
                                 <td>${detail.startDate}</td>
                                 <td>${detail.endDate}</td>
                                 <td style="color: ${detail.applied ? 'red' : 'green'}; font-weight: bold;">${detail.applied ? 'Yes' : (detail.deductible && detail.isOfficerTime ? 'No (Officer Time)' : 'No')}</td>
-                                <td>${detail.days}</td>
+                                <td>${detail.days}${detail.applied ? ' (' + fmtYMD(detail.lost) + ')' : ''}</td>
                                 <td>${detail.notes}</td>
                             </tr>`).join('')}
                         </table>
@@ -2055,9 +2551,10 @@
                     </style>
                 </head>
                 <body>
+                    <div style="text-align: center; font-weight: bold; color: #6f42c1; border: 1px solid #6f42c1; padding: 3px; margin-bottom: 8px;">${cui}</div>
                     <div class="header">
                         <h1 class="title">MARINE CORPS PAY ENTRY BASE DATE (PEBD) CALCULATION REPORT</h1>
-                        <p class="subtitle">Reference: PAA 04-25 - Administrative Guidance on Creditable Service and PEBD</p>
+                        <p class="subtitle">References: PAA 04-25 - Administrative Guidance on Creditable Service and PEBD; MARADMIN 052/26 - MCTFS Advisory to Identify Required Corrections to PEBD</p>
                         <p class="subtitle">Generated: ${data.calculationDate}</p>
                     </div>
 
@@ -2104,9 +2601,153 @@ ${timeLossSectionHTML}
                         <p><strong>IMPORTANT NOTES:</strong> This calculation is for reference only. Official PEBD adjustments require proper channels. Verify against source documents (DD Form 4, DD Form 214, NAVMC 763).</p>
                         <p style="text-align: center;"><em>Generated by Marine Corps PEBD Calculator by Semper Admin</em></p>
                     </div>
+                    <div style="text-align: center; font-weight: bold; color: #6f42c1; border: 1px solid #6f42c1; padding: 3px; margin-top: 8px;">${cui}</div>
                 </body>
                 </html>
             `;
+        }
+
+        // Guided examples. Each entry fills the form; the user clicks
+        // Calculate and compares against the expected value on the card.
+        // Expected results are locked by the test suite worked examples.
+        const PEBD_EXAMPLES = [
+            {
+                foundational: '20240115', status: 'Enlisted',
+                pathway: 'Enlisted DEP/Direct/Reenlisted/Prior Service',
+                periods: [
+                    { type: 'Regular Navy', start: '20180601', end: '20211215', notes: 'Prior Navy enlistment' }
+                ],
+                losses: []
+            },
+            {
+                foundational: '19950710', status: 'Enlisted',
+                pathway: 'Enlisted DEP/Direct/Reenlisted/Prior Service',
+                periods: [
+                    { type: 'Delayed Entry Program (Before January 1985)', start: '19791220', end: '19800330', notes: 'Pre-1985 DEP - creditable' },
+                    { type: 'Regular Marine Corps', start: '19800401', end: '19860813', notes: 'First active period' },
+                    { type: 'Regular Marine Corps', start: '19900815', end: '19920814', notes: 'Second active period after break' }
+                ],
+                losses: []
+            },
+            {
+                foundational: '20170220', status: 'Enlisted',
+                pathway: 'Enlisted DEP/Direct/Reenlisted/Prior Service',
+                periods: [
+                    { type: 'Regular Marine Corps', start: '20120718', end: '20150810', notes: 'Enlistment ended by hardship discharge' }
+                ],
+                losses: [
+                    { type: 'AWOL (Absence Without Leave)', start: '20150210', end: '20150316', officer: false, notes: 'Not made good - deducted on 30-day basis' }
+                ]
+            },
+            {
+                foundational: '20250601', status: 'Enlisted',
+                pathway: 'Enlisted DEP/Direct/Reenlisted/Prior Service',
+                periods: [
+                    { type: 'Military Academy Service', start: '20200801', end: '20240525', notes: 'Credits on enlisted pathway only' }
+                ],
+                losses: []
+            },
+            {
+                foundational: '20230301', status: 'Enlisted',
+                pathway: 'Enlisted DEP/Direct/Reenlisted/Prior Service',
+                periods: [
+                    { type: 'Delayed Entry Program (Post 1989 No IDT)', start: '20190115', end: '20190630', notes: 'No IDT drills - not creditable' },
+                    { type: 'Regular Marine Corps', start: '20190701', end: '20220630', notes: 'Active period - creditable' }
+                ],
+                losses: []
+            }
+        ];
+
+        function loadExample(n) {
+            const ex = PEBD_EXAMPLES[n];
+            if (!ex) return;
+
+            initializePeriods();
+            initializeTimeLossPeriods();
+            document.getElementById('foundationalPEBD').value = ex.foundational;
+            document.getElementById('marineStatus').value = ex.status;
+            document.getElementById('pathwayType').value = ex.pathway;
+
+            while (servicePeriodRows().length < ex.periods.length) addServicePeriod();
+            const rows = servicePeriodRows();
+            ex.periods.forEach((p, k) => {
+                const i = parseInt(rows[k].id.replace('service-period-', ''), 10);
+                document.querySelector(`select[data-period="${i}"][data-field="serviceType"]`).value = p.type;
+                document.querySelector(`input[data-period="${i}"][data-field="startDate"]`).value = p.start;
+                document.querySelector(`input[data-period="${i}"][data-field="endDate"]`).value = p.end;
+                document.querySelector(`input[data-period="${i}"][data-field="notes"]`).value = p.notes || '';
+                updatePeriod(i);
+            });
+
+            ex.losses.forEach(t => {
+                addTimeLossPeriod();
+                const lossRows = document.querySelectorAll('#timeLossBody tr[id^="timeloss-period-"]');
+                const row = lossRows[lossRows.length - 1];
+                const i = parseInt(row.id.replace('timeloss-period-', ''), 10);
+                row.querySelector('select[data-field="lossType"]').value = t.type;
+                row.querySelector('input[data-field="startDate"]').value = t.start;
+                row.querySelector('input[data-field="endDate"]').value = t.end;
+                row.querySelector('input[data-field="officerTime"]').checked = !!t.officer;
+                row.querySelector('input[data-field="notes"]').value = t.notes || '';
+                updateTimeLossPeriod(i);
+            });
+
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('printBtn').disabled = true;
+            calculationResult = null;
+            refreshCuiBanner();
+            showToast('Example loaded. Review the inputs, then click Calculate PEBD.', 'info', 4500);
+            document.getElementById('foundationalPEBD').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // MMPB-21 escalation package per MARADMIN 052/26 Step 3
+        function emailMmpb21Package() {
+            if (!calculationResult) {
+                showToast('Calculate first, then send the package.', 'warning');
+                return;
+            }
+            const data = calculationResult;
+            const cfg = window.COMPLIANCE_CONFIG || {};
+            const cui = cfg.cuiMarking || 'CUI//SP-PRVCY';
+            const subject = 'PEBD Correction Request (' + cui + ')';
+
+            const lines = [
+                cui,
+                '',
+                'PEBD CORRECTION REQUEST',
+                'Per MARADMIN 052/26',
+                '',
+                'Calculation Date: ' + (data.calculationDate || new Date().toISOString().slice(0, 10)),
+                '',
+                '--- INPUTS ---',
+                'Marine Status: ' + data.marineStatus,
+                'Pathway Type: ' + data.pathwayType,
+                'Foundational PEBD: ' + data.foundationalPEBD,
+                'Service Periods (creditable): ' + data.numPeriods,
+                '',
+                '--- CALCULATED RESULT ---',
+                'Calculated PEBD: ' + data.calculatedPEBD,
+                'Net Creditable Service: ' + data.normalized.years + ' years, ' + data.normalized.months + ' months, ' + data.normalized.days + ' days',
+                'Total Time Loss (30-day basis): ' + (data.timeLossApplied ? fmtYMD(data.timeLossTotals) : 'none'),
+                '',
+                '--- ATTACHMENT INSTRUCTIONS ---',
+                'Before sending, attach the printed report.',
+                'Use the Print Report button on the results view to generate the PDF.',
+                '',
+                '--- WORKFLOW STAGE ---',
+                'Step 3 of MARADMIN 052/26: Escalation to MMPB-21.',
+                'Marine has notified PAC. PAC has validated against OMPF and MCTFS D188 remark.',
+                'Forwarding for review and adjustment via MISSO 9.',
+                '',
+                cui
+            ];
+            const url = 'mailto:' + (cfg.mmpb21Mailto || 'SMB_Pay_Entry_Base_Date_Correction@usmc.mil') +
+                '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(lines.join('\n'));
+
+            if (url.length > 1900) {
+                showToast('Email package too long for one mailto URL. Send the printed report as an attachment instead.', 'warning', 6000);
+            }
+            window.location.href = url;
         }
 
         // Reset all
@@ -2114,23 +2755,16 @@ ${timeLossSectionHTML}
             document.getElementById('foundationalPEBD').value = '';
             document.getElementById('marineStatus').value = 'Enlisted';
             document.getElementById('pathwayType').value = 'Enlisted DEP/Direct/Reenlisted/Prior Service';
-            
-            // Clear all period inputs
-            for (let i = 0; i < 10; i++) {
-                document.querySelector(`select[data-period="${i}"][data-field="serviceType"]`).value = '';
-                document.querySelector(`input[data-period="${i}"][data-field="startDate"]`).value = '';
-                document.querySelector(`input[data-period="${i}"][data-field="endDate"]`).value = '';
-                document.querySelector(`input[data-period="${i}"][data-field="notes"]`).value = '';
-                document.getElementById(`creditable-${i}`).innerHTML = '';
-                document.getElementById(`days-${i}`).innerHTML = '';
-            }
 
-            // Clear time loss periods
+            // Rebuild the dynamic period tables
+            initializePeriods();
             initializeTimeLossPeriods();
 
             document.getElementById('results').classList.add('hidden');
             document.getElementById('printBtn').disabled = true;
             calculationResult = null;
+            refreshCuiBanner();
+            showToast('Form reset.', 'info');
         }
 
     </script>
@@ -2147,6 +2781,9 @@ ${timeLossSectionHTML}
         <svg class="feedback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
         <span class="feedback-fab-label">Feedback</span>
     </a>
+
+    <!-- CR-05 CUI bottom banner, hidden until the form contains data -->
+    <div id="cuiBottomBanner" aria-live="polite">CUI//SP-PRVCY</div>
 
     <!-- Legal Footer -->
     <div class="legal-footer">

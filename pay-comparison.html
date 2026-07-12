@@ -1070,6 +1070,114 @@
             }
         }
 
+        /* Semper Admin logo in the page header - transparent emblem, no crop */
+        .header-logo {
+            width: 112px;
+            height: auto;
+            display: block;
+            margin: 0 auto 12px;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+        }
+        @media (max-width: 768px) {
+            .header-logo { width: 84px; }
+        }
+
+        /* Inline UI icons - replace emoji with consistent stroke SVGs */
+        .ui-icon {
+            width: 1.1em;
+            height: 1.1em;
+            vertical-align: -0.18em;
+            margin-right: 7px;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* How-to-use and guided example panels */
+        details.guide-details {
+            background: var(--color-card);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        details.guide-details summary {
+            cursor: pointer;
+            padding: 14px 18px;
+            font-weight: 700;
+            color: var(--color-heading);
+            list-style: none;
+            user-select: none;
+        }
+        details.guide-details summary::-webkit-details-marker { display: none; }
+        details.guide-details summary::before {
+            content: '▸';
+            display: inline-block;
+            margin-right: 8px;
+            transition: transform 0.15s ease;
+        }
+        details.guide-details[open] summary::before { transform: rotate(90deg); }
+        .guide-body {
+            padding: 0 18px 18px 18px;
+            font-size: 0.92rem;
+            line-height: 1.6;
+        }
+        .guide-body ol { margin: 8px 0 8px 22px; }
+        .guide-body li { margin-bottom: 6px; }
+        .guide-note {
+            background: var(--color-muted);
+            border-left: 4px solid var(--color-primary);
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 0.85rem;
+        }
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 14px;
+            padding: 0 18px 18px 18px;
+        }
+        .example-card {
+            background: var(--color-muted);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .example-card h4 {
+            margin: 0;
+            font-size: 0.95rem;
+            color: var(--color-heading);
+        }
+        .example-card p {
+            margin: 0;
+            font-size: 0.82rem;
+            color: var(--color-muted-foreground);
+            flex-grow: 1;
+        }
+        .example-expect {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--color-foreground);
+            background: var(--color-card);
+            border: 1px dashed var(--color-border-strong);
+            border-radius: 6px;
+            padding: 6px 8px;
+        }
+        .example-load-btn {
+            align-self: flex-start;
+            background: var(--color-primary);
+            color: var(--color-primary-foreground);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .example-load-btn:hover { background: var(--color-primary-hover); }
+
         /* Guide section 8: motion gates behind prefers-reduced-motion */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -1086,7 +1194,7 @@
     <!-- Legal Consent Modal -->
     <div id="legalModal" class="legal-modal-overlay">
         <div class="legal-modal">
-            <div class="legal-modal-header">📋 Terms & Legal</div>
+            <div class="legal-modal-header">Terms & Legal</div>
 
             <div class="legal-modal-tabs">
                 <button class="legal-modal-tab-button active" onclick="switchLegalTab('terms')">Terms of Service</button>
@@ -1155,6 +1263,7 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
+            <img class="header-logo" src="assets/images/logo.png" alt="Semper Admin logo">
             <h1 class="title">MARINE CORPS BASIC PAY <span class="gradient-accent">COMPARISON</span></h1>
             <p class="subtitle">by Semper Admin - Dual-PEBD Month-by-Month Pay Difference</p>
             <p class="subtitle">Companion to the Semper Admin PEBD Calculator</p>
@@ -1163,16 +1272,68 @@
                 Back to PEBD Calculator
             </a>
             <div class="official-notice">
-                <h4>⚠️ OFFICIAL USE NOTICE</h4>
+                <h4><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>OFFICIAL USE NOTICE</h4>
                 <p>This tool produces estimates for administrative review. Official pay determinations require validation through DFAS and proper Marine Corps channels. Do not input classified or sensitive personal information.</p>
                 <p><strong>Method.</strong> Synthetic 30-day months for all proration, February included. Day 31 never generates pay. YOS increases on the PEBD anniversary. Any change in either scenario splits both, so day counts match on every row.</p>
                 <p id="tableMeta" style="margin-top:8px;"></p>
             </div>
         </div>
 
+        <!-- How To Use -->
+        <details class="guide-details">
+            <summary><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>HOW TO USE THIS TOOL</summary>
+            <div class="guide-body">
+                <ol>
+                    <li><strong>Enter the two PEBDs.</strong> Scenario A is the original PEBD past pay was computed under. Scenario B is the corrected PEBD - arriving from the PEBD Calculator link fills both automatically.</li>
+                    <li><strong>Set the calculation period.</strong> Pay is computed from the exact start date through the exact end date, month by month on the synthetic 30-day calendar.</li>
+                    <li><strong>Build the career timeline.</strong> One row per rank held, chronological, inclusive dates, using exact pay-table rank codes (E1-E9, W1-W5, O1-O10, O1E-O3E, E0 for the sub-4-month entry rate). Leave the final end date empty for a still-current rank. The timeline must cover the whole period.</li>
+                    <li><strong>Click Calculate Comparison.</strong> Every row shows the month, days paid, rank, both YOS values, both monthly rates, both prorated amounts, and the difference. A YOS anniversary or rate change mid-month splits the row.</li>
+                    <li><strong>Read the totals.</strong> A negative difference means Scenario B pays less - the Marine was overpaid under the original PEBD. A positive difference means underpayment to be recovered.</li>
+                    <li><strong>Export.</strong> Use Export CSV for the full row-by-row table, or Run Verification Case to confirm the engine against the reviewed Novak fixture before relying on a build.</li>
+                </ol>
+                <div class="guide-note">
+                    <strong>Verify before official use.</strong> Estimates only. Official pay determinations come from DFAS through the chain of command.
+                </div>
+            </div>
+        </details>
+
+        <!-- Guided Examples -->
+        <details class="guide-details">
+            <summary><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 10L12 5 2 10l10 5 10-5z"></path><path d="M6 12.5V17c0 1.66 2.69 3 6 3s6-1.34 6-3v-4.5"></path></svg>GUIDED EXAMPLES - LOAD ONE, THEN CLICK CALCULATE COMPARISON</summary>
+            <div class="guide-body" style="padding-bottom: 0;">
+                <p style="margin: 0 0 12px 0;">Each example fills the form. Review the inputs, click <strong>Calculate Comparison</strong>, and compare the totals against the expected values on the card.</p>
+            </div>
+            <div class="example-grid">
+                <div class="example-card">
+                    <h4>1. One-Year PEBD Shift, Single Rank</h4>
+                    <p>An E5 whose PEBD moves one year later. Watch June 2024 - Scenario A crosses into the over-4 YOS band three months before Scenario B... the anniversary rows split mid-month.</p>
+                    <div class="example-expect">Expected: A $40,388.40, B $40,039.95, Difference ($348.45)</div>
+                    <button class="example-load-btn" onclick="loadPayExample(0)">Load Example</button>
+                </div>
+                <div class="example-card">
+                    <h4>2. Promotion Mid-Period</h4>
+                    <p>E6 promoted to E7 on 1 Sep 2024 across a two-year window. Rank changes split both scenarios identically - only the YOS bands differ.</p>
+                    <div class="example-expect">Expected: A $115,048.66, B $113,974.79, Difference ($1,073.87)</div>
+                    <button class="example-load-btn" onclick="loadPayExample(1)">Load Example</button>
+                </div>
+                <div class="example-card">
+                    <h4>3. Entry Rate - E0 Four-Month Rule</h4>
+                    <p>A new Marine at the E0 sub-4-month entry rate. Scenario B's earlier PEBD reaches the 4-month mark sooner, so B pays the full E1 rate earlier - a positive difference.</p>
+                    <div class="example-expect">Expected: A $16,917.60, B $17,919.30, Difference $1,001.70</div>
+                    <button class="example-load-btn" onclick="loadPayExample(2)">Load Example</button>
+                </div>
+                <div class="example-card">
+                    <h4>4. February 29 PEBD</h4>
+                    <p>An E4 with a leap-day PEBD. In non-leap years the anniversary falls back to Feb 28, in 2024 it lands on Feb 29 - both split February while it still totals 30 synthetic days.</p>
+                    <div class="example-expect">Expected: A $69,528.11, B $67,761.60, Difference ($1,766.51)</div>
+                    <button class="example-load-btn" onclick="loadPayExample(3)">Load Example</button>
+                </div>
+            </div>
+        </details>
+
         <!-- Member Information -->
         <div class="section">
-            <h2 class="section-title">👤 MEMBER INFORMATION</h2>
+            <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>MEMBER INFORMATION</h2>
             <div class="grid grid-3">
                 <div class="form-group">
                     <label for="edipi">EDIPI</label>
@@ -1215,7 +1376,7 @@
 
         <!-- Career Timeline -->
         <div class="section">
-            <h2 class="section-title">📋 CAREER TIMELINE</h2>
+            <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>CAREER TIMELINE</h2>
             <p style="margin-bottom: 15px;">One row per rank held, chronological, inclusive dates. Use the exact pay-table rank code, O1E and O2E and O3E included where they apply. The timeline must cover the full calculation period.</p>
             <div class="table-container">
                 <table aria-label="Career timeline">
@@ -1241,18 +1402,18 @@
 
         <!-- Control Buttons -->
         <div class="button-container">
-            <button class="btn-primary" onclick="runCalculation()">🧮 Calculate Comparison</button>
-            <button class="btn-success" id="exportBtn" onclick="exportCSV()" disabled>📄 Export CSV</button>
-            <button class="btn-success" id="dtmsBtn" onclick="exportDTMS()" disabled>🗂️ Export DTMS (.xls)</button>
-            <button class="btn-secondary" onclick="loadVerificationCase()">Run Verification Case</button>
-            <button class="btn-secondary" onclick="resetAll()">🔄 Reset All</button>
+            <button class="btn-primary" onclick="runCalculation()"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"></rect><line x1="8" y1="7" x2="16" y2="7"></line><line x1="8" y1="12" x2="8.01" y2="12"></line><line x1="12" y1="12" x2="12.01" y2="12"></line><line x1="16" y1="12" x2="16.01" y2="12"></line><line x1="8" y1="16" x2="8.01" y2="16"></line><line x1="12" y1="16" x2="12.01" y2="16"></line><line x1="16" y1="16" x2="16.01" y2="16"></line></svg>Calculate Comparison</button>
+            <button class="btn-success" id="exportBtn" onclick="exportCSV()" disabled><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>Export CSV</button>
+            <button class="btn-success" id="dtmsBtn" onclick="exportDTMS()" disabled><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>Export DTMS (.xls)</button>
+            <button class="btn-secondary" onclick="loadVerificationCase()"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Run Verification Case</button>
+            <button class="btn-secondary" onclick="resetAll()"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg>Reset All</button>
         </div>
 
         <!-- Results -->
         <div id="results" class="hidden">
             <div class="section">
-                <h2 class="section-title">📊 COMPARISON RESULTS<span class="legal-badge">Reference Only</span></h2>
-                <p class="not-official-banner"><strong>⚠️ Not for official use:</strong> Pay estimates only. Always verify against official pay records (LES, Master Military Pay Account) and contact your PAC or DFAS for official pay determinations.</p>
+                <h2 class="section-title"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>COMPARISON RESULTS<span class="legal-badge">Reference Only</span></h2>
+                <p class="not-official-banner"><strong><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>Not for official use:</strong> Pay estimates only. Always verify against official pay records (LES, Master Military Pay Account) and contact your PAC or DFAS for official pay determinations.</p>
                 <div class="result-highlight">
                     <div class="grid grid-3" style="align-items:center; text-align:center;">
                         <div>
@@ -1452,7 +1613,7 @@ const MAX_EFF = 20260101;
       const calStart = firstMonth ? start.d : 1;
       let calEnd = Math.min(last, 30);
       if (isLastMonth) calEnd = Math.min(calEnd, end.d, last);
-      // A period ending on Feb last day still maps to synthetic 30 through synth().
+      // A period ending on Feb last day still maps to synthetic 30 through synthEnd().
       if (calStart <= calEnd) {
         // Boundary scan. A boundary at day X means state(X) differs from state(X-1).
         const boundaries = [];
@@ -1463,7 +1624,11 @@ const MAX_EFF = 20260101;
           prevKey = k;
         }
         const cuts = [calStart].concat(boundaries);
-        const synth = function (d) { return d === last && last < 30 ? 30 : d; };
+        // Segment ends on February's last calendar day extend through synthetic
+        // day 30. Segment starts stay at their calendar position (capped at 30)
+        // so a state change on Feb 28/29 still yields a 30-day February total.
+        const synthEnd = function (d) { return d === last && last < 30 ? 30 : Math.min(d, 30); };
+        const synthStart = function (d) { return Math.min(d, 30); };
         let monthDays = 0;
 
         for (let s = 0; s < cuts.length; s++) {
@@ -1472,7 +1637,7 @@ const MAX_EFF = 20260101;
           const segStartInt = y * 10000 + m * 100 + segStart;
           const segEndInt = y * 10000 + m * 100 + segEnd;
           const st = stateOn(payData, timeline, pebdA, pebdB, segStartInt);
-          const days = synth(segEnd) - synth(segStart) + 1;
+          const days = synthEnd(segEnd) - synthStart(segStart) + 1;
           monthDays += days;
 
           if (st.tRank === null) {
@@ -1881,6 +2046,36 @@ function exportDTMS() {
 }
 
 var NOVAK_EXPECTED = { a: 50794452, b: 49159524, d: -1634928 };
+// Guided examples. Each fills the form; the user clicks Calculate Comparison
+// and checks the totals against the expected values on the card.
+var PAY_EXAMPLES = [
+  { name: 'OneYearShift-E5', pebdA: '2019-03-10', pebdB: '2020-03-10', start: '2024-01-01', end: '2024-12-31',
+    timeline: [['E5', 20190310, 0]] },
+  { name: 'Promotion-E6E7', pebdA: '2014-07-15', pebdB: '2015-02-20', start: '2024-01-01', end: '2025-12-31',
+    timeline: [['E6', 20140715, 20240831], ['E7', 20240901, 0]] },
+  { name: 'EntryRate-E0', pebdA: '2025-01-01', pebdB: '2024-09-01', start: '2025-01-01', end: '2025-08-31',
+    timeline: [['E0', 20250101, 20250630], ['E1', 20250701, 0]] },
+  { name: 'LeapDayPEBD-E4', pebdA: '2020-02-29', pebdB: '2020-09-01', start: '2023-01-01', end: '2024-12-31',
+    timeline: [['E4', 20200229, 0]] }
+];
+
+function loadPayExample(n) {
+  var ex = PAY_EXAMPLES[n];
+  if (!ex) return;
+  document.getElementById('pebdA').value = ex.pebdA; updateBadge('pebdA');
+  document.getElementById('pebdB').value = ex.pebdB; updateBadge('pebdB');
+  document.getElementById('periodStart').value = ex.start; updateBadge('periodStart');
+  document.getElementById('periodEnd').value = ex.end; updateBadge('periodEnd');
+  document.getElementById('timelineBody').innerHTML = '';
+  timelineCount = 0;
+  ex.timeline.forEach(function (r) { addTimelineRow(r[0], r[1], r[2]); });
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('exportBtn').disabled = true;
+  document.getElementById('dtmsBtn').disabled = true;
+  showError('Example loaded. Review the inputs, then click Calculate Comparison and compare the totals to the example card.');
+  document.getElementById('edipi').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
 function loadVerificationCase() {
   document.getElementById('pebdA').value = '2017-06-03'; updateBadge('pebdA');
   document.getElementById('pebdB').value = '2018-04-06'; updateBadge('pebdB');
