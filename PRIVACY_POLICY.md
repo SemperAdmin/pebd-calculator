@@ -43,7 +43,7 @@ When you enter service period information and click "Calculate PEBD," the follow
    - Click the "Reset All" button
 
 ### Pay Comparison Data
-The Basic Pay Comparison page works the same way: PEBD dates, career timeline entries, and the optional member last name and EDIPI are processed entirely in your browser's memory against a pay table embedded in the page itself. Nothing is looked up remotely and nothing is transmitted. The EDIPI is used only to populate the DTMS transaction file you export to your own device.
+The Basic Pay Comparison page works the same way: PEBD dates, career timeline entries, and the optional EDIPI are processed entirely in your browser's memory against a pay table embedded in the page itself. Nothing is looked up remotely and nothing is transmitted. The EDIPI is used only in the names of files you export and inside the DTMS transaction file, all of which save directly to your own device.
 
 ### Page-to-Page Handoff
 The "Open in Pay Comparison" link on the calculator's results passes only the two PEBD dates to the comparison page as URL parameters (for example, `pay-comparison.html?pebdA=20180406&pebdB=20170603`). No names or other personal data are ever placed in a URL. The parameters are read locally by your browser and are not sent to any server.

@@ -1175,13 +1175,9 @@
             <h2 class="section-title">👤 MEMBER INFORMATION</h2>
             <div class="grid grid-3">
                 <div class="form-group">
-                    <label for="memberName">Member Last Name</label>
-                    <input type="text" id="memberName" placeholder="Used in the export file name">
-                </div>
-                <div class="form-group">
                     <label for="edipi">EDIPI</label>
                     <input type="text" id="edipi" inputmode="numeric" maxlength="10" placeholder="10-digit DoD ID">
-                    <small>Needed only for the DTMS export. Processed on your device; appears only inside the file you download.</small>
+                    <small>Used in export file names and inside the DTMS file. Processed on your device only.</small>
                 </div>
                 <div class="form-group">
                     <label for="pebdA">Original PEBD - Scenario A</label>
@@ -1703,7 +1699,7 @@ function runCalculation() {
       if (!PAY_DATA[r.rank]) throw new Error('Rank code ' + r.rank + ' is not in the embedded pay table. Check the code.');
     });
     var inputs = {
-      name: document.getElementById('memberName').value.trim() || 'MEMBER',
+      edipi: document.getElementById('edipi').value.trim(),
       pebdA: dateInputToInt('pebdA'),
       pebdB: dateInputToInt('pebdB'),
       start: dateInputToInt('periodStart'),
@@ -1794,7 +1790,7 @@ function exportCSV() {
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url;
-  a.download = lastInputs.name.toUpperCase().replace(/[^A-Z0-9]/g, '') + '-' + lastInputs.pebdA + '-' + lastInputs.pebdB + '.csv';
+  a.download = (lastInputs.edipi || 'MEMBER') + '-' + lastInputs.pebdA + '-' + lastInputs.pebdB + '.csv';
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -1875,19 +1871,17 @@ function exportDTMS() {
     showError('Every month nets to zero difference - there is nothing to submit to DTMS.');
     return;
   }
-  var name = (document.getElementById('memberName').value.trim() || 'MEMBER').toUpperCase().replace(/[^A-Z0-9]/g, '');
   [['693', split.neg], ['694', split.pos]].forEach(function (pair) {
     if (!pair[1].length) return;
     var ws = XLSX.utils.aoa_to_sheet(dtmsSheetRows(pair[0], pair[1], edipi));
     var wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Normal Transactions');
-    XLSX.writeFile(wb, 'DTMS_TTC_' + pair[0] + '_' + name + '.xls', { bookType: 'biff8' });
+    XLSX.writeFile(wb, 'DTMS_TTC_' + pair[0] + '_' + edipi + '.xls', { bookType: 'biff8' });
   });
 }
 
 var NOVAK_EXPECTED = { a: 50794452, b: 49159524, d: -1634928 };
 function loadVerificationCase() {
-  document.getElementById('memberName').value = 'Novak';
   document.getElementById('pebdA').value = '2017-06-03'; updateBadge('pebdA');
   document.getElementById('pebdB').value = '2018-04-06'; updateBadge('pebdB');
   document.getElementById('periodStart').value = '2018-07-20'; updateBadge('periodStart');
@@ -1909,7 +1903,7 @@ function loadVerificationCase() {
 
 function resetAll() {
   if (!confirm('Reset all inputs and results?')) return;
-  ['memberName', 'edipi'].forEach(function (id) { document.getElementById(id).value = ''; });
+  ['edipi'].forEach(function (id) { document.getElementById(id).value = ''; });
   ['pebdA', 'pebdB', 'periodStart', 'periodEnd'].forEach(function (id) {
     document.getElementById(id).value = '';
     updateBadge(id);
