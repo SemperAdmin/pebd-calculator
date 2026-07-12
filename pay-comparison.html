@@ -1179,6 +1179,11 @@
                     <input type="text" id="memberName" placeholder="Used in the export file name">
                 </div>
                 <div class="form-group">
+                    <label for="edipi">EDIPI</label>
+                    <input type="text" id="edipi" inputmode="numeric" maxlength="10" placeholder="10-digit DoD ID">
+                    <small>Needed only for the DTMS export. Processed on your device; appears only inside the file you download.</small>
+                </div>
+                <div class="form-group">
                     <label for="pebdA">Original PEBD - Scenario A</label>
                     <div class="date-wrap">
                         <input type="date" id="pebdA" style="width:100%" aria-label="Original PEBD">
@@ -1242,6 +1247,7 @@
         <div class="button-container">
             <button class="btn-primary" onclick="runCalculation()">🧮 Calculate Comparison</button>
             <button class="btn-success" id="exportBtn" onclick="exportCSV()" disabled>📄 Export CSV</button>
+            <button class="btn-success" id="dtmsBtn" onclick="exportDTMS()" disabled>🗂️ Export DTMS (.xls)</button>
             <button class="btn-secondary" onclick="loadVerificationCase()">Run Verification Case</button>
             <button class="btn-secondary" onclick="resetAll()">🔄 Reset All</button>
         </div>
@@ -1594,6 +1600,7 @@ const MAX_EFF = 20260101;
             checkLegalConsent();
         });
     </script>
+    <script src="assets/vendor/xlsx.full.min.js"></script>
     <script>
 /* Semper Admin Basic Pay Comparison - UI layer. No browser storage used. */
 'use strict';
@@ -1713,10 +1720,12 @@ function runCalculation() {
     lastInputs = inputs;
     renderResults();
     document.getElementById('exportBtn').disabled = false;
+    document.getElementById('dtmsBtn').disabled = false;
   } catch (e) {
     showError('Calculation stopped. ' + e.message);
     document.getElementById('results').classList.add('hidden');
     document.getElementById('exportBtn').disabled = true;
+    document.getElementById('dtmsBtn').disabled = true;
     lastResult = null;
   }
 }
@@ -1790,6 +1799,92 @@ function exportCSV() {
   URL.revokeObjectURL(url);
 }
 
+/* DTMS TTC export. The sign travels in the TTC, not the amount: months
+   where Scenario B pays LESS than A (negative difference) are checkages
+   under TTC 693; months where B pays MORE are payments under TTC 694.
+   One row per month per pay code, effective-dated inside that month.
+   Tax code defaults to 4 - change individual rows to 9 in Excel for any
+   month the member was in a combat zone. Purpose code is always I. */
+var DTMS = {
+  taxCode: '4',
+  purposeCode: 'I',
+  history: 'PEBD  CHANGE'
+};
+
+function dtmsPaycode(rank) {
+  // 10000 = officer (incl. warrant), 20000 = enlisted
+  return /^[OW]/.test(rank) ? 10000 : 20000;
+}
+
+function buildDTMSRows() {
+  // Aggregate engine segments into one row per month per pay code.
+  var groups = {};
+  lastResult.rows.forEach(function (row) {
+    var segStart = row.dateRange.split('-')[0];
+    var key = segStart.slice(0, 6) + '|' + dtmsPaycode(row.rank);
+    if (!groups[key]) {
+      groups[key] = { paycode: dtmsPaycode(row.rank), diffCents: 0, ed: segStart };
+    }
+    groups[key].diffCents += row.diff;
+    if (segStart < groups[key].ed) groups[key].ed = segStart;
+  });
+  var neg = [], pos = [];
+  Object.keys(groups).sort().forEach(function (k) {
+    var g = groups[k];
+    if (g.diffCents === 0) return;
+    (g.diffCents < 0 ? neg : pos).push({
+      paycode: g.paycode,
+      amount: Math.abs(g.diffCents) / 100,
+      ed: g.ed
+    });
+  });
+  return { neg: neg, pos: pos };
+}
+
+function dtmsSheetRows(ttc, rows, edipi) {
+  var aoa = [
+    [ttc + '-003: CHEK|___-$___(___)-___ ED___|'],
+    ['TYPE', 'EDIPI', 'MEMBER', 'PAYCODE', 'AMOUNT', 'TAX CODE', 'PURPOSE CD', 'ED', 'HISTORY']
+  ];
+  rows.forEach(function (r, i) {
+    aoa.push([
+      i === 0 ? 'Normal' : '',
+      Number(edipi),
+      '',
+      r.paycode,
+      r.amount,
+      DTMS.taxCode,
+      DTMS.purposeCode,
+      r.ed,
+      DTMS.history
+    ]);
+  });
+  return aoa;
+}
+
+function exportDTMS() {
+  if (!lastResult) return;
+  clearError();
+  var edipi = document.getElementById('edipi').value.trim();
+  if (!/^\d{10}$/.test(edipi)) {
+    showError('DTMS export needs the member 10-digit EDIPI in Member Information.');
+    return;
+  }
+  var split = buildDTMSRows();
+  if (!split.neg.length && !split.pos.length) {
+    showError('Every month nets to zero difference - there is nothing to submit to DTMS.');
+    return;
+  }
+  var name = (document.getElementById('memberName').value.trim() || 'MEMBER').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  [['693', split.neg], ['694', split.pos]].forEach(function (pair) {
+    if (!pair[1].length) return;
+    var ws = XLSX.utils.aoa_to_sheet(dtmsSheetRows(pair[0], pair[1], edipi));
+    var wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Normal Transactions');
+    XLSX.writeFile(wb, 'DTMS_TTC_' + pair[0] + '_' + name + '.xls', { bookType: 'biff8' });
+  });
+}
+
 var NOVAK_EXPECTED = { a: 50794452, b: 49159524, d: -1634928 };
 function loadVerificationCase() {
   document.getElementById('memberName').value = 'Novak';
@@ -1814,7 +1909,7 @@ function loadVerificationCase() {
 
 function resetAll() {
   if (!confirm('Reset all inputs and results?')) return;
-  ['memberName'].forEach(function (id) { document.getElementById(id).value = ''; });
+  ['memberName', 'edipi'].forEach(function (id) { document.getElementById(id).value = ''; });
   ['pebdA', 'pebdB', 'periodStart', 'periodEnd'].forEach(function (id) {
     document.getElementById(id).value = '';
     updateBadge(id);
@@ -1824,6 +1919,7 @@ function resetAll() {
   addTimelineRow();
   document.getElementById('results').classList.add('hidden');
   document.getElementById('exportBtn').disabled = true;
+  document.getElementById('dtmsBtn').disabled = true;
   clearError();
   lastResult = null;
 }
