@@ -808,6 +808,45 @@
             box-shadow: 0 0 0 3px var(--color-ring);
         }
 
+        .direct-path-box {
+            margin: 0 0 20px;
+            padding: 14px 18px;
+            background-color: var(--color-muted);
+            border: 1px solid var(--color-border-soft);
+            border-left: 4px solid var(--color-primary);
+            border-radius: 8px;
+        }
+
+        .direct-path-title {
+            margin: 0 0 4px;
+            font-weight: 700;
+            color: var(--color-heading);
+        }
+
+        .direct-path-text {
+            margin: 0 0 10px;
+            font-size: 0.9rem;
+            color: var(--color-muted-foreground);
+        }
+
+        .direct-path-btn {
+            display: inline-block;
+            padding: 8px 18px;
+            background-color: var(--color-primary);
+            color: var(--color-primary-foreground);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .direct-path-btn:hover { filter: brightness(1.1); }
+
+        .direct-path-btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px var(--color-ring);
+        }
+
         .companion-prompt {
             background-color: var(--color-muted);
             border: 1px solid var(--color-border-soft);
@@ -1407,8 +1446,15 @@
             </p>
             <a class="header-nav-link" href="pay-comparison.html">
                 <svg class="feedback-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="20" x2="12" y2="10"></line><line x1="18" y1="20" x2="18" y2="4"></line><line x1="6" y1="20" x2="6" y2="16"></line></svg>
-                Companion Tool: Basic Pay Comparison →
+                Basic Pay Comparison (no PEBD calculation needed) →
             </a>
+        </div>
+
+        <!-- Direct path for offices holding an already-corrected PEBD -->
+        <div class="direct-path-box" role="note">
+            <p class="direct-path-title">PEBD already corrected by HQMC or MMPB-21?</p>
+            <p class="direct-path-text">Skip this calculator. The Basic Pay Comparison tool runs on its own with the original PEBD, the corrected PEBD, the EDIPI, the correction period and the grades held. No statements of service needed.</p>
+            <a class="direct-path-btn" href="pay-comparison.html">Go to Basic Pay Comparison →</a>
         </div>
 
         <!-- How To Use -->
