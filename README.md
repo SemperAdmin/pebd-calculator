@@ -19,7 +19,7 @@ PEBD determines a service member's pay longevity and is calculated by subtractin
 - **Content Security Policy** — Strict CSP meta, nosniff, and no-referrer headers (NIST SP 800-53 SC-18)
 - **Print Report** — Formatted, CUI-marked print report with governing references and calculation breakdown
 - **MARADMIN 052/26 Workflow** — An optional PEBD of Record input drives the para 3.c routing note (D188 remark update at PAC level when the PEBD matches, MMPB-21 when it does not), a pre-filled EPAR text for the Marine's para 3.a request to the servicing PAC, and a CUI-marked mailto package for the PAC-to-MMPB-21 forward with the para 3.d MISSO 9 step stated
-- **Basic Pay Comparison Companion** — Hand off the foundational and calculated PEBD to `pay-comparison.html` for a month-by-month basic pay difference (embedded pay tables 1993-2026)
+- **Basic Pay Comparison Companion** — Hand off the foundational and calculated PEBD to `pay-comparison.html` for a month-by-month basic pay difference (embedded pay tables 1993-2026). Also runs standalone: when HQMC or MMPB-21 has already corrected the PEBD, enter the original and corrected PEBDs directly, with a one-grade shortcut for the career timeline
 - **Built-In Instructions** — A collapsible "How to Use" walkthrough on both pages covering every step from data entry to escalation
 - **Guided Examples** — Eleven one-click examples with verified expected results: seven on the calculator (including the PAA 04-25 and DODFMR official worked examples and a PLC officer candidate under DODFMR para 2.2.1.8.1) and four on the pay comparison (anniversary splits, mid-period promotion, the E0 four-month rule, and a Feb 29 PEBD)
 - **Toast Notifications** — Non-intrusive toast messages replace alert() dialogs

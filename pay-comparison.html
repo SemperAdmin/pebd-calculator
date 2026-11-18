@@ -587,6 +587,27 @@
             background-color: var(--color-neutral-600);
         }
 
+        .single-grade-row {
+            margin-top: 16px;
+            padding-top: 14px;
+            border-top: 1px solid var(--color-border-soft);
+            text-align: center;
+        }
+
+        .single-grade-row label { display: block; font-weight: 600; margin-bottom: 6px; }
+
+        .single-grade-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .single-grade-controls input { width: 110px; }
+
+        .single-grade-row small { display: block; margin-top: 6px; }
+
         .btn-info {
             background-color: var(--color-card);
             color: var(--color-primary);
@@ -1300,9 +1321,9 @@
             <summary><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>HOW TO USE THIS TOOL</summary>
             <div class="guide-body">
                 <ol>
-                    <li><strong>Enter the two PEBDs.</strong> Scenario A is the original PEBD past pay was computed under. Scenario B is the corrected PEBD - arriving from the PEBD Calculator link fills both automatically.</li>
+                    <li><strong>Enter the two PEBDs.</strong> Scenario A is the original PEBD past pay was computed under. Scenario B is the corrected PEBD. When HQMC or MMPB-21 has already corrected the PEBD, type both in and skip the PEBD Calculator. Arriving from the PEBD Calculator link fills both automatically.</li>
                     <li><strong>Set the calculation period.</strong> Pay is computed from the exact start date through the exact end date, month by month on the synthetic 30-day calendar.</li>
-                    <li><strong>Build the career timeline.</strong> One row per rank held, chronological, inclusive dates, using exact pay-table rank codes (E1-E9, W1-W5, O1-O10, O1E-O3E, E0 for the sub-4-month entry rate). Leave the final end date empty for a still-current rank. The timeline must cover the whole period.</li>
+                    <li><strong>Build the career timeline.</strong> One row per rank held, chronological, inclusive dates, using exact pay-table rank codes (E1-E9, W1-W5, O1-O10, O1E-O3E, E0 for the sub-4-month entry rate). Leave the final end date empty for a still-current rank. The timeline must cover the whole period. If the Marine held one grade for the entire period, enter it under Same Grade for Whole Period and click Fill Timeline.</li>
                     <li><strong>Click Calculate Comparison.</strong> Every row shows the month, days paid, rank, both YOS values, both monthly rates, both prorated amounts, and the difference. A YOS anniversary or rate change mid-month splits the row.</li>
                     <li><strong>Read the totals.</strong> A negative difference means Scenario B pays less - the Marine was overpaid under the original PEBD. A positive difference means underpayment to be recovered.</li>
                     <li><strong>Export.</strong> Use Export CSV for the full row-by-row table, or Run Verification Case to confirm the engine against the reviewed Novak fixture before relying on a build. Export DTMS produces upload-ready TTC 693 (checkage) and 694 (credit) sheets with tax codes set per DODFMR Vol 7A: credits are tax code 3, and the 694 workbook carries a READ ME sheet reminding the clerk to change combat-zone months to 9 before upload. Checkages are tax code 3 in the current calendar year and tax code 4 for prior years. Because the codes are set from today's date, re-export any file you hold across 31 December.</li>
@@ -1374,15 +1395,15 @@
                         <input type="date" id="pebdA" style="width:100%" aria-label="Original PEBD">
                         <div class="date-badge" id="pebdABadge"></div>
                     </div>
-                    <small>The PEBD past pay was computed under</small>
+                    <small>The PEBD of record before correction, which past pay was computed under</small>
                 </div>
                 <div class="form-group">
-                    <label for="pebdB">Recalculated PEBD - Scenario B</label>
+                    <label for="pebdB">Corrected PEBD - Scenario B</label>
                     <div class="date-wrap">
-                        <input type="date" id="pebdB" style="width:100%" aria-label="Recalculated PEBD">
+                        <input type="date" id="pebdB" style="width:100%" aria-label="Corrected PEBD">
                         <div class="date-badge" id="pebdBBadge"></div>
                     </div>
-                    <small>The corrected PEBD from the PEBD Calculator</small>
+                    <small>The corrected PEBD of record from HQMC or MMPB-21, or the PEBD Calculator result</small>
                 </div>
                 <div class="form-group">
                     <label for="periodStart">Period Start</label>
@@ -1422,6 +1443,14 @@
             </div>
             <div style="text-align:center">
                 <button class="btn-info" onclick="addTimelineRow()">Add Rank Period</button>
+            </div>
+            <div class="single-grade-row">
+                <label for="singleGrade">Same Grade for Whole Period</label>
+                <div class="single-grade-controls">
+                    <input type="text" id="singleGrade" list="rankCodes" placeholder="E5" maxlength="3" style="text-transform:uppercase" aria-describedby="singleGradeHelp">
+                    <button class="btn-info" onclick="fillSingleGrade()">Fill Timeline</button>
+                </div>
+                <small id="singleGradeHelp">Replaces the timeline with one row from Period Start with no end date. Use it only when the Marine held this grade for the entire period.</small>
             </div>
             <datalist id="rankCodes"></datalist>
         </div>
@@ -1853,6 +1882,23 @@ function renumberTimeline() {
   rows.forEach(function (r) { if (!r.querySelector('.empty-state')) { r.children[0].textContent = n; n++; } });
 }
 
+/* One-grade shortcut. Replaces the timeline with a single open-ended row
+   starting on Period Start, for a Marine who held one grade the whole period. */
+function fillSingleGrade() {
+  clearError();
+  var rank = document.getElementById('singleGrade').value.trim().toUpperCase();
+  var start = dateInputToInt('periodStart');
+  if (!rank) { showError('Enter a grade code under Same Grade for Whole Period.'); return; }
+  if (!PAY_DATA[rank]) { showError('Rank code ' + rank + ' is not in the embedded pay table. Check the code.'); return; }
+  if (!start) { showError('Set Period Start before filling the timeline.'); return; }
+  if (collectTimeline().length > 0 &&
+      !confirm('Replace the current career timeline with one ' + rank + ' row?')) return;
+  document.getElementById('timelineBody').innerHTML = '';
+  timelineCount = 0;
+  addTimelineRow(rank, start, null);
+  document.getElementById('singleGrade').value = rank;
+}
+
 function collectTimeline() {
   var rows = [];
   document.querySelectorAll('#timelineBody tr').forEach(function (tr) {
@@ -1920,7 +1966,7 @@ function runCalculation() {
       maxEff: MAX_EFF
     };
     if (!inputs.pebdA) throw new Error('Original PEBD, Scenario A, is required.');
-    if (!inputs.pebdB) throw new Error('Recalculated PEBD, Scenario B, is required.');
+    if (!inputs.pebdB) throw new Error('Corrected PEBD, Scenario B, is required.');
     if (!inputs.start || !inputs.end) throw new Error('Period start and end are required.');
 
     lastResult = PayEngine.computeComparison(inputs);
@@ -2241,7 +2287,7 @@ function loadVerificationCase() {
 
 function resetAll() {
   if (!confirm('Reset all inputs and results?')) return;
-  ['edipi'].forEach(function (id) { document.getElementById(id).value = ''; });
+  ['edipi', 'singleGrade'].forEach(function (id) { document.getElementById(id).value = ''; });
   ['pebdA', 'pebdB', 'periodStart', 'periodEnd'].forEach(function (id) {
     document.getElementById(id).value = '';
     updateBadge(id);
