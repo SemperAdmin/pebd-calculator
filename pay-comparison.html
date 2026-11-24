@@ -2090,6 +2090,14 @@ function runCalculation() {
   }
 }
 
+/* HTML-escapes any value placed into innerHTML. Rank codes are validated
+   against PAY_DATA before the engine runs, so this is defense in depth in
+   case that check ever changes. */
+function escapeHtml(v) {
+  return String(v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
 function renderResults() {
   var r = lastResult;
   var fm = PayEngine.fmtMoney;
@@ -2104,8 +2112,8 @@ function renderResults() {
     '<div class="table-container"><table aria-label="Grades used in this comparison"><thead><tr><th>Grade</th><th>From</th><th>Through</th><th>YOS A</th><th>YOS B</th><th>Check</th></tr></thead><tbody>' +
     r.gradeSummary.map(function (g) {
       var yr = function (p) { return p[0] === p[1] ? String(p[0]) : p[0] + ' to ' + p[1]; };
-      return '<tr' + (g.flag ? ' class="grade-flag"' : '') + '><td><strong>' + g.rank + '</strong></td><td>' + g.from + '</td><td>' + g.to +
-        '</td><td>' + yr(g.yosA) + '</td><td>' + yr(g.yosB) + '</td><td>' +
+      return '<tr' + (g.flag ? ' class="grade-flag"' : '') + '><td><strong>' + escapeHtml(g.rank) + '</strong></td><td>' + escapeHtml(g.from) + '</td><td>' + escapeHtml(g.to) +
+        '</td><td>' + escapeHtml(yr(g.yosA)) + '</td><td>' + escapeHtml(yr(g.yosB)) + '</td><td>' +
         (g.flag ? '<span class="fail-badge">Grade below published YOS</span>' : '<span class="ok-badge">OK</span>') + '</td></tr>';
     }).join('') + '</tbody></table></div>';
 
@@ -2118,24 +2126,24 @@ function renderResults() {
 
   var wbox = document.getElementById('warnBox');
   if (r.warnings.length) {
-    wbox.innerHTML = '<strong>Warnings.</strong><ul>' + r.warnings.map(function (w) { return '<li>' + w + '</li>'; }).join('') + '</ul>';
+    wbox.innerHTML = '<strong>Warnings.</strong><ul>' + r.warnings.map(function (w) { return '<li>' + escapeHtml(w) + '</li>'; }).join('') + '</ul>';
     wbox.classList.remove('hidden');
   } else wbox.classList.add('hidden');
 
   var tbody = document.getElementById('segBody');
   tbody.innerHTML = r.rows.map(function (row) {
-    var lookupNote = row.codeB !== row.rank ? ' <span class="lookup-badge">' + row.codeB + ' rate</span>' : '';
+    var lookupNote = row.codeB !== row.rank ? ' <span class="lookup-badge">' + escapeHtml(row.codeB) + ' rate</span>' : '';
     var diffColor = row.diff < 0 ? 'var(--color-status-stale)' : (row.diff > 0 ? 'var(--color-status-fresh)' : 'var(--color-foreground)');
     return '<tr>' +
-      '<td>' + row.year + '</td>' +
-      '<td>' + row.month + '</td>' +
-      '<td>' + row.dateRange + '</td>' +
-      '<td>' + row.rank + lookupNote + '</td>' +
-      '<td style="text-align:center">' + row.days + '</td>' +
-      '<td style="text-align:center">' + row.yosA + '</td>' +
+      '<td>' + escapeHtml(row.year) + '</td>' +
+      '<td>' + escapeHtml(row.month) + '</td>' +
+      '<td>' + escapeHtml(row.dateRange) + '</td>' +
+      '<td>' + escapeHtml(row.rank) + lookupNote + '</td>' +
+      '<td style="text-align:center">' + escapeHtml(row.days) + '</td>' +
+      '<td style="text-align:center">' + escapeHtml(row.yosA) + '</td>' +
       '<td>' + fm(row.rateA) + '</td>' +
       '<td>' + fm(row.proA) + '</td>' +
-      '<td style="text-align:center">' + row.yosB + '</td>' +
+      '<td style="text-align:center">' + escapeHtml(row.yosB) + '</td>' +
       '<td>' + fm(row.rateB) + '</td>' +
       '<td>' + fm(row.proB) + '</td>' +
       '<td style="font-weight:bold;color:' + diffColor + '">' + fm(row.diff) + '</td>' +
