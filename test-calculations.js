@@ -787,6 +787,56 @@ assertEqual(SHIPPED_EXAMPLES[6].plcFinancialAssistance, 'No', 'PLC example loads
     assertEqual(CALC_SOURCE.includes(ref), true, `Page carries PAA 04-25 term: ${ref}`);
 });
 
+// ---------- 13. Grade plausibility checks (shipped pay engine) ----------
+// Field report: an O1 keyed as O10 drew the capped O10 rate in both
+// scenarios, so the months showed a $0 difference and the checkage came
+// out about $11K short with no warning. Synthetic case, no member data.
+
+console.log('\n[13] Grade plausibility checks (loaded from pay-comparison.html)');
+{
+    const PE = ENGINE.PayEngine;
+    const run = (tl, a, b, s, e) => PE.computeComparison({
+        pebdA: a, pebdB: b, start: s, end: e,
+        timeline: tl.map(r => ({ rank: r[0], start: r[1], end: r[2] })), payData: ENGINE.PAY_DATA });
+    const below = w => /^Check the grade\./.test(w);
+    const sameRate = w => /different pay table columns/.test(w);
+
+    [[0, 0], [1, 0], [2, 2], [5, 4], [7, 6], [19, 18], [20, 20], [29, 26], [45, 40]].forEach(([y, c]) =>
+        assertEqual(PE.payColumn(y), c, `YOS ${y} sits in pay column ${c}`));
+
+    const typo = run([['O10', 20180901, 20200731], ['O2', 20200801, 0]], 20160801, 20180215, 20180901, 20220630);
+    const ok = run([['O1', 20180901, 20200731], ['O2', 20200801, 0]], 20160801, 20180215, 20180901, 20220630);
+    assertEqual(typo.warnings.filter(below).length, 2, 'O10 at 2 YOS warns once per scenario');
+    assertEqual(typo.warnings.some(w => /Scenario A looks up O10 at 2 to 3 YOS from 20180901 through 20200730/.test(w)), true,
+        'O10 warning names scenario, YOS span and dates');
+    assertEqual(typo.warnings.some(sameRate), false, 'below-published months do not also raise the same-rate warning');
+    assertEqual(typo.gradeSummary.map(g => g.rank + (g.flag ? '!' : '')).join(','), 'O10!,O2', 'grade summary flags the O10 row only');
+    assertEqual(typo.rows.filter(r => r.rank === 'O10').every(r => r.diff === 0), true, 'the O10 typo zeroes the difference, the failure mode reported');
+    assertEqual(ok.warnings.length, 0, 'the same case keyed O1 raises no warning');
+    assertEqual(ok.gradeSummary.map(g => g.rank + (g.flag ? '!' : '')).join(','), 'O1,O2', 'grade summary for the O1 case is clean');
+    assertEqual(ok.totalDiff < typo.totalDiff, true, 'keying O1 restores the larger checkage');
+    assertEqual(ok.gradeSummary[0].from + '-' + ok.gradeSummary[0].to, '20180901-20200730', 'grade summary spans the O1 months');
+
+    const flat = run([['O3', 20240201, 0]], 20170101, 20180101, 20240201, 20240630);
+    assertEqual(flat.warnings.length, 0, 'O3 at 7 vs 6 YOS shares a pay column, so equal rates raise no warning');
+
+    const capped = run([['O10', 20240101, 0]], 19980101, 20000101, 20240101, 20241230);
+    assertEqual(capped.warnings.filter(below).length, 0, 'a real O10 at 24 and 26 YOS is inside the published table');
+    assertEqual(capped.rows.every(r => r.rateA === r.rateB), true, 'O10 at 24 and 26 YOS draws one capped rate');
+    assertEqual(capped.warnings.filter(sameRate).length, 1, 'capped months with different columns raise one grouped notice');
+
+    const order = (function (src) {
+        const a = src.indexOf('function rankSortKey');
+        const b = src.indexOf('function addTimelineRow');
+        const o = {};
+        new Function('PAY_DATA', 'o', src.slice(a, b) + '\no.f = rankDatalist;')(ENGINE.PAY_DATA, o);
+        return o.f().match(/value="([^"]+)"/g).map(v => v.slice(7, -1));
+    })(DTMS_SOURCE);
+    assertEqual(order.slice(order.indexOf('O1'), order.indexOf('O4') + 1).join(','), 'O1,O1E,O2,O2E,O3,O3E,O4', 'rank list runs in grade order');
+    assertEqual(order.indexOf('O10') === order.indexOf('O9') + 1, true, 'O10 follows O9, not O1');
+    assertEqual(order[0], 'E0', 'rank list opens at E0');
+}
+
 // ---------- Summary ----------
 
 console.log('\n============================');
