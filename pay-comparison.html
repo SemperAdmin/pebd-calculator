@@ -587,6 +587,15 @@
             background-color: var(--color-neutral-600);
         }
 
+        .scenario-note {
+            margin: 16px 0 0;
+            padding: 12px 16px;
+            background-color: var(--color-muted);
+            border-left: 4px solid var(--color-primary);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
         .grade-summary { margin: 16px 0; }
 
         .grade-summary-title {
@@ -1337,7 +1346,7 @@
                     <li><strong>Set the calculation period.</strong> Pay is computed from the exact start date through the exact end date, month by month on the synthetic 30-day calendar.</li>
                     <li><strong>Build the career timeline.</strong> One row per rank held, chronological, inclusive dates, using exact pay-table rank codes (E1-E9, W1-W5, O1-O10, O1E-O3E, E0 for the sub-4-month entry rate). Leave the final end date empty for a still-current rank. The timeline must cover the whole period. If the Marine held one grade for the entire period, enter it under Same Grade for Whole Period and click Fill Timeline.</li>
                     <li><strong>Click Calculate Comparison.</strong> Every row shows the month, days paid, rank, both YOS values, both monthly rates, both prorated amounts, and the difference. A YOS anniversary or rate change mid-month splits the row. Check the Grades Used table and the warnings before export. A grade below its first published YOS column, such as O10 at 2 YOS, is flagged there.</li>
-                    <li><strong>Read the totals.</strong> A negative difference means Scenario B pays less - the Marine was overpaid under the original PEBD. A positive difference means underpayment to be recovered.</li>
+                    <li><strong>Read the totals.</strong> A negative difference means Scenario B pays less - the Marine was overpaid under the original PEBD. A positive difference means underpayment to be recovered. Scenario A is computed from the pay table under the original PEBD, not read from the D701. A $0 month means both PEBDs give the same table rate for the grade entered, not that the account is correct. Compare Scenario A against the member's actual pay on the D701 before relying on any month.</li>
                     <li><strong>Export.</strong> Use Export CSV for the full row-by-row table, or Run Verification Case to confirm the engine against the reviewed Novak fixture before relying on a build. Export DTMS produces upload-ready TTC 693 (checkage) and 694 (credit) sheets with tax codes set per DODFMR Vol 7A: credits are tax code 3, and the 694 workbook carries a READ ME sheet reminding the clerk to change combat-zone months to 9 before upload. Checkages are tax code 3 in the current calendar year and tax code 4 for prior years. Because the codes are set from today's date, re-export any file you hold across 31 December.</li>
                 </ol>
                 <div class="guide-note">
@@ -1407,7 +1416,7 @@
                         <input type="date" id="pebdA" style="width:100%" aria-label="Original PEBD">
                         <div class="date-badge" id="pebdABadge"></div>
                     </div>
-                    <small>The PEBD of record before correction, which past pay was computed under</small>
+                    <small>The PEBD of record before correction. Scenario A pay comes from the pay table under this date, not from the D701</small>
                 </div>
                 <div class="form-group">
                     <label for="pebdB">Corrected PEBD - Scenario B</label>
@@ -1500,6 +1509,7 @@
                         </div>
                     </div>
                 </div>
+                <p class="scenario-note" role="note"><strong>Scenario A is computed, not read from MCTFS.</strong> It is the pay table rate for the grades entered under the original PEBD. It does not read the D701, D926 or D927 remarks. A $0 month means both PEBDs give the same table rate, not that the account is correct. Compare Scenario A against the member's actual pay on the D701 before relying on the difference.</p>
                 <div class="grade-summary" id="gradeSummary"></div>
                 <div class="integrity-line" id="integrityLine"></div>
                 <div id="warnBox" class="warn-box hidden"></div>
