@@ -2,7 +2,7 @@
 Marine Corps PEBD Calculator & Basic Pay Comparison by Semper Admin
 
 **Effective Date:** June 2, 2026
-**Last Updated:** July 9, 2026
+**Last Updated:** November 27, 2026
 
 ---
 
@@ -21,11 +21,13 @@ The PEBD Calculator and the Basic Pay Comparison page:
 - Does NOT use cookies to track you
 - Does NOT use analytics or telemetry (Google Analytics, Segment, etc.)
 - Does NOT store your calculations in a database
-- Does NOT log your IP address or device information
+- Does NOT itself log your IP address or device information (see Hosting below)
 - Does NOT require user accounts or authentication
 - Does NOT share data with third parties
 
-All calculations run entirely within your web browser. Your military service dates, PEBD values, and period details are processed locally and never leave your device unless you manually export or print them.
+All calculations run entirely within your web browser. Your military service dates, PEBD values, and period details are processed locally and never leave your device unless you manually export, print or email them.
+
+**Hosting.** The hosting platforms (cloud.gov and GitHub Pages) keep standard web server access logs, such as IP address, time, requested page and browser type, for operations and security. Semper Admin does not add tracking of its own.
 
 ---
 
