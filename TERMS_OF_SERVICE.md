@@ -2,7 +2,7 @@
 Marine Corps PEBD Calculator & Basic Pay Comparison by Semper Admin
 
 **Effective Date:** June 2, 2026
-**Last Updated:** July 9, 2026
+**Last Updated:** November 27, 2026
 
 ---
 
@@ -105,11 +105,9 @@ This Tool does not constitute legal, financial, or military personnel advice. Fo
 
 ## 8. Intellectual Property
 
-The PEBD Calculator, the Basic Pay Comparison page, their design, and underlying code are intellectual property of Semper Admin. You may use the Tool personally but may not:
-- Redistribute, republish, or resell the Tool
-- Claim ownership or authorship
-- Create derivative works without permission
-- Reverse-engineer or decompile the code
+The PEBD Calculator, the Basic Pay Comparison page, their design, and underlying code are the work of Semper Admin.
+
+**Source code.** The source code is published under the MIT License (see the LICENSE file in the repository). Nothing in these terms limits the rights that license grants. These terms govern your use of the hosted Tool. You may not present the Tool as official or misrepresent its authorship.
 
 The Marine Corps PAA 04-25 document is official U.S. military publication, not created by Semper Admin.
 

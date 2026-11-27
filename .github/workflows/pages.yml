@@ -5,8 +5,9 @@
 # After merging this file, switch the Pages source in repo Settings:
 #   Settings > Pages > Build and deployment > Source: GitHub Actions
 #
-# This is a static-site deployment. No build step is required; the repo root
-# is uploaded as-is.
+# This is a static-site deployment with no build step. Only the files the two
+# pages use are published: uploading the repo root also served working notes,
+# old index copies and other internal files as public pages.
 
 name: Deploy to GitHub Pages
 
@@ -35,14 +36,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Assemble the published files
+        run: |
+          set -euo pipefail
+          mkdir -p _site
+          # The two pages, everything they load, and the legal documents they link.
+          cp index.html pay-comparison.html semper-tokens.css _site/
+          cp favicon.ico favicon.svg apple-touch-icon.png apple-touch-icon-precomposed.png robots.txt _site/
+          cp PRIVACY_POLICY.md TERMS_OF_SERVICE.md ACCESSIBILITY.md _site/
+          cp -R assets _site/assets
+          touch _site/.nojekyll
+          find _site -maxdepth 1 | sort
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload repository as Pages artifact
+      - name: Upload the published files
         uses: actions/upload-pages-artifact@v3
         with:
-          # Publish the repo root. No build directory.
-          path: .
+          path: _site
 
   deploy:
     name: Deploy to Pages
