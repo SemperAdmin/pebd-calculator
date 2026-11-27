@@ -57,7 +57,7 @@ The tests load the calculation code straight out of the two pages, so the code u
 | Environment | URL | How |
 |---|---|---|
 | cloud.gov | https://pebd-calculator.app.cloud.gov | `manifest.yml` (staticfile buildpack) and the manual **Deploy to cloud.gov** workflow. The sandbox is managed by the private cloudgov-redeploy repository. |
-| GitHub Pages | https://semperadmin.github.io/pebd-calculator/ | Published from the repository root of `main`. |
+| GitHub Pages | https://semperadmin.github.io/pebd-calculator/ | `.github/workflows/pages.yml` on push to `main`. Publishes only the two pages, their assets and the linked legal documents. |
 
 ## Feedback and support
 
